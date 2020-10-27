@@ -1,5 +1,25 @@
 #:kivy 1.11.1
 
+<MainMenu>
+    BoxLayout:
+        detection: detection_button
+        escalation: escalation_button
+        penetration: penetration_button
+
+        size: root.width, root.height
+        orientation: "vertical"
+        spacing: 32
+        padding: (200, 60)
+        Button:
+            id: detection_button
+            text: "detection"
+        Button:
+            id: escalation_button
+            text: "escalation"
+        Button:
+            id: penetration_button
+            text: "penetration"
+
 <ChangeMAC>
     size: 500, 40
     BoxLayout:
