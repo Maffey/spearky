@@ -1,32 +1,50 @@
 #:kivy 1.11.1
 
-<MainMenu>
+<MainMenu>:
     BoxLayout:
+        # The first name references the variable in Python code, the second the ID in .kv file.
         detection: detection_button
         escalation: escalation_button
         penetration: penetration_button
 
         size: root.width, root.height
         orientation: "vertical"
-        spacing: 32
-        padding: (200, 60)
+        spacing: 100
+        padding: (250, 100)
+
         Button:
             id: detection_button
             text: "detection"
+
         Button:
             id: escalation_button
             text: "escalation"
+
         Button:
             id: penetration_button
             text: "penetration"
 
-<ChangeMAC>
+<ChangeMAC>:
+    mac_input: mac_text_input
     size: 500, 40
+
     BoxLayout:
         size: root.width, root.height
-        orientation: "horizontal"
-        Label:
-            text: "MAC address:"
-        TextInput:
-            hint_text: "00:a1:b2:c3:d4:d5:"
-            multiline: False
+        orientation: "vertical"
+
+        BoxLayout:
+            orientation: "horizontal"
+
+            Label:
+                text: "MAC address:"
+
+            TextInput:
+                id: mac_text_input
+                hint_text: "00:a1:b2:c3:d4:d5:"
+                multiline: False
+
+        Button:
+            id: submit_mac_button
+            # todo: remove that later
+            text: "Submit" if submit_mac_button.state == "normal" else "Submitted!"
+            on_press: root.submit_mac_callback()
