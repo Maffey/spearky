@@ -1,4 +1,5 @@
 #:kivy 1.11.1
+#:import mac_changer core.penetration.mac_changer
 
 # Root widget of the app.
 WindowManager:
@@ -32,6 +33,9 @@ WindowManager:
 
 <ChangeMACScreen>:
     name: "change_mac_screen"
+    original_mac: original_mac_label
+    current_mac: current_mac_label
+    interface_input: interface_text_input
     mac_input: mac_text_input
 
     size: 500, 40
@@ -40,8 +44,30 @@ WindowManager:
     BoxLayout:
         orientation: "vertical"
 
-        BoxLayout:
-            orientation: "horizontal"
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Original MAC address:"
+
+            Label:
+                id: original_mac_label
+                text: mac_changer.get_original_mac()
+
+            Label:
+                text: "Current MAC address:"
+
+            Label:
+                id: current_mac_label
+                text: mac_changer.get_current_mac()
+
+            Label:
+                text: "Interface:"
+
+            TextInput:
+                id: interface_text_input
+                hint_text: "eth0"
+                multiline: False
 
             Label:
                 text: "MAC address:"
