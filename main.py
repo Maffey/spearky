@@ -1,10 +1,7 @@
 import kivy
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.widget import Widget
 
 import core.penetration.mac_changer as mac_changer
 
