@@ -18,6 +18,18 @@ class MainMenuScreen(Screen):
     pass
 
 
+class DetectionToolsScreen(Screen):
+    pass
+
+
+class EscalationToolsScreen(Screen):
+    pass
+
+
+class PenetrationToolsScreen(Screen):
+    pass
+
+
 # TODO: implement some sort of feedback for user (i.e. toast pop-up)
 class ChangeMACScreen(Screen):
     # Initialize Widgets of the class taken from .kv file.

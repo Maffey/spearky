@@ -4,11 +4,17 @@
 
 #:set standard_padding 20
 #:set standard_text_height 30
+#:set standard_menu_padding 40
+
 
 # Root widget of the app.
 WindowManager:
     MainMenuScreen:
+    DetectionToolsScreen:
+    EscalationToolsScreen:
+    PenetrationToolsScreen:
     ChangeMACScreen:
+
 
 <MainMenuScreen>:
     name: "main_menu_screen"
@@ -17,7 +23,7 @@ WindowManager:
     BoxLayout:
         orientation: "vertical"
         spacing: root.height / 6
-        padding: 40
+        padding: standard_menu_padding
 
         Label:
             text: "Spearky"
@@ -38,8 +44,40 @@ WindowManager:
             pos_hint: {"center_x": 0.5}
             size_hint_x: 0.5
             on_release:
+                app.root.current = "penetration_tools_screen"
+                root.manager.transition.direction = "left"
+
+
+<DetectionToolsScreen>:
+
+
+<EscalationToolsScreen>:
+
+
+<PenetrationToolsScreen>:
+    name: "penetration_tools_screen"
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: root.height / 3
+        padding: standard_menu_padding
+
+        Button:
+            text: "Change MAC address"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
                 app.root.current = "change_mac_screen"
                 root.manager.transition.direction = "left"
+
+        Button:
+            text: "Back"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "main_menu_screen"
+                root.manager.transition.direction = "right"
+
 
 <ChangeMACScreen>:
     name: "change_mac_screen"
@@ -130,5 +168,5 @@ WindowManager:
                 pos_hint: {"center_x": 0.2, "top": 0.3}
                 size_hint: 0.25, 0.25
                 on_release:
-                    app.root.current = "main_menu_screen"
+                    app.root.current = "penetration_tools_screen"
                     root.manager.transition.direction = "right"
