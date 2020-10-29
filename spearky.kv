@@ -1,11 +1,13 @@
 #:kivy 1.11.1
 
-<MainMenu>:
+# Root widget of the app.
+WindowManager:
+    MainMenuScreen:
+    ChangeMACScreen:
+
+<MainMenuScreen>:
+    name: "main_menu_screen"
     BoxLayout:
-        # The first name references the variable in Python code, the second the ID in .kv file.
-        detection: detection_button
-        escalation: escalation_button
-        penetration: penetration_button
 
         size: root.width, root.height
         orientation: "vertical"
@@ -13,18 +15,17 @@
         padding: (250, 100)
 
         Button:
-            id: detection_button
             text: "detection"
 
         Button:
-            id: escalation_button
             text: "escalation"
 
         Button:
-            id: penetration_button
             text: "penetration"
+            on_release: app.root.current = "change_mac_screen"
 
-<ChangeMAC>:
+<ChangeMACScreen>:
+    name: "change_mac_screen"
     mac_input: mac_text_input
     size: 500, 40
 
@@ -45,6 +46,5 @@
 
         Button:
             id: submit_mac_button
-            # todo: remove that later
-            text: "Submit" if submit_mac_button.state == "normal" else "Submitted!"
-            on_press: root.submit_mac_callback()
+            text: "Submit"
+            on_release: root.submit_mac()
