@@ -7,30 +7,37 @@ WindowManager:
 
 <MainMenuScreen>:
     name: "main_menu_screen"
+
+    # TODO: change how the buttons are layered out or the type of Layout.
     BoxLayout:
-
-        size: root.width, root.height
         orientation: "vertical"
-        spacing: 100
-        padding: (250, 100)
+        spacing: root.height / 5
+        padding: 50
 
         Button:
-            text: "detection"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            text: "Detection Tools"
 
         Button:
-            text: "escalation"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            text: "Escalation Tools"
 
         Button:
-            text: "penetration"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            text: "Penetration Tools"
             on_release: app.root.current = "change_mac_screen"
 
 <ChangeMACScreen>:
     name: "change_mac_screen"
     mac_input: mac_text_input
+
     size: 500, 40
 
+    # TODO: change how the widgets are layered out or the type of Layout.
     BoxLayout:
-        size: root.width, root.height
         orientation: "vertical"
 
         BoxLayout:
