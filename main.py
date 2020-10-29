@@ -21,6 +21,7 @@ class MainMenuScreen(Screen):
     pass
 
 
+# TODO: implement some sort of feedback for user (i.e. toast pop-up)
 class ChangeMACScreen(Screen):
     # Initialize Widgets of the class taken from .kv file.
     mac_input = ObjectProperty(None)
@@ -28,16 +29,28 @@ class ChangeMACScreen(Screen):
     original_mac = ObjectProperty(None)
     current_mac = ObjectProperty(None)
 
-    # Get original MAC address (read: https://superuser.com/questions/298102/how-to-restore-mac-address-in-linux)
+    # Default value for interface.
+    current_interface = "eth0"
 
     def submit_mac(self):
         # Store inputs in additional variables to allow us to clear Text Inputs instantly.
         interface, mac_address = self.interface_input.text, self.mac_input.text
+        self.current_interface = interface
         self.mac_input.text = ""
         self.interface_input.text = ""
 
-        # Change the MAC address.
+        # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(interface, mac_address)
+
+    def revert_mac(self):
+        """Restores computer's MAC address to original one."""
+        self.mac_input.text = ""
+        self.interface_input.text = ""
+
+        print("[+] Reverting MAC address...")
+
+        # Change the Label's text of current MAC address while performing said change.
+        self.current_mac.text = mac_changer.perform_mac_change(self.current_interface, self.original_mac.text)
 
 
 class SpearkyApp(App):
