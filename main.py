@@ -22,6 +22,10 @@ class DetectionToolsScreen(Screen):
     pass
 
 
+class SniffPacketsScreen(Screen):
+    pass
+
+
 class EscalationToolsScreen(Screen):
     pass
 
@@ -60,6 +64,10 @@ class ChangeMACScreen(Screen):
 
         # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(self.current_interface, self.original_mac.text)
+
+
+class SpoofARPScreen(Screen):
+    pass
 
 
 class SpearkyApp(App):

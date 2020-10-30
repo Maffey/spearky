@@ -10,10 +10,15 @@
 # Root widget of the app.
 WindowManager:
     MainMenuScreen:
+
     DetectionToolsScreen:
+    SniffPacketsScreen:
+
     EscalationToolsScreen:
+
     PenetrationToolsScreen:
     ChangeMACScreen:
+    SpoofARPScreen:
 
 
 <MainMenuScreen>:
@@ -33,6 +38,9 @@ WindowManager:
             text: "Detection Tools"
             pos_hint: {"center_x": 0.5}
             size_hint_x: 0.5
+            on_release:
+                app.root.current = "detection_tools_screen"
+                root.manager.transition.direction = "left"
 
         Button:
             text: "Escalation Tools"
@@ -49,6 +57,46 @@ WindowManager:
 
 
 <DetectionToolsScreen>:
+    name: "detection_tools_screen"
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: root.height / 4
+        padding: standard_menu_padding
+
+        Button:
+            text: "Sniff Packets"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "sniff_packets_screen"
+                root.manager.transition.direction = "left"
+
+        Button:
+            text: "Back"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "main_menu_screen"
+                root.manager.transition.direction = "right"
+
+
+<SniffPacketsScreen>:
+    name: "sniff_packets_screen"
+
+    BoxLayout:
+        orientation: "vertical"
+
+        Label:
+            text: "Test"
+
+        Button:
+            text: "Back"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "detection_tools_screen"
+                root.manager.transition.direction = "right"
 
 
 <EscalationToolsScreen>:
@@ -59,15 +107,23 @@ WindowManager:
 
     BoxLayout:
         orientation: "vertical"
-        spacing: root.height / 3
+        spacing: root.height / 4
         padding: standard_menu_padding
 
         Button:
-            text: "Change MAC address"
+            text: "Change MAC Address"
             pos_hint: {"center_x": 0.5}
             size_hint_x: 0.5
             on_release:
                 app.root.current = "change_mac_screen"
+                root.manager.transition.direction = "left"
+
+        Button:
+            text: "Spoof ARP Table"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "spoof_arp_screen"
                 root.manager.transition.direction = "left"
 
         Button:
@@ -170,3 +226,21 @@ WindowManager:
                 on_release:
                     app.root.current = "penetration_tools_screen"
                     root.manager.transition.direction = "right"
+
+
+<SpoofARPScreen>:
+    name: "spoof_arp_screen"
+
+    BoxLayout:
+        orientation: "vertical"
+
+        Label:
+            text: "Test"
+
+        Button:
+            text: "Back"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.5
+            on_release:
+                app.root.current = "penetration_tools_screen"
+                root.manager.transition.direction = "right"
