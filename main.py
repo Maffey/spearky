@@ -26,13 +26,35 @@ class DetectionToolsScreen(Screen):
 
 
 class SniffPacketsScreen(Screen):
+    # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
+    # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
+    accessed_websites = ObjectProperty(None)
+    found_credentials = ObjectProperty(None)
+    sniffer = None
 
-    def submit_interface(self):
+    def start_sniffing(self):
         interface = self.interface_input.text
-        print(interface)
-        # TODO: this my require asynchronous job.
-        packet_sniffer.perform_sniffing(interface)
+        if interface == "":
+            self.sniffer = packet_sniffer.create_sniffer()
+        else:
+            self.sniffer = packet_sniffer.create_sniffer(interface)
+        self.sniffer.start()
+
+        self.interface_input.text = ""
+        print("[+] Sniffing has been started.")
+
+    # TODO: implement continuous sniffing output in the future. Use Clock for this.
+    # TODO: it crashes when sniffing hasn't been started first.
+    def stop_sniffing(self):
+        self.sniffer.stop()
+        print("[+] Sniffing has been stopped.")
+        with open("data/sniffing_log.txt", "r+") as log_file:
+            self.accessed_websites.text = log_file.read()
+            log_file.truncate(0)
+        with open("data/sniffing_credentials.txt", "r+") as log_file:
+            self.found_credentials.text = log_file.read()
+            log_file.truncate(0)
 
 
 class EscalationToolsScreen(Screen):
@@ -56,6 +78,7 @@ class ChangeMACScreen(Screen):
 
     def submit_mac(self):
         # Store inputs in additional variables to allow us to clear Text Inputs instantly.
+        # TODO: Handle errors. Use default interface if none was provided.
         interface, mac_address = self.interface_input.text, self.mac_input.text
         self.current_interface = interface
         self.mac_input.text = ""

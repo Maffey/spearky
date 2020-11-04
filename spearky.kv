@@ -1,6 +1,9 @@
 #:kivy 1.11.1
 
+#: import threading threading
+
 #:import mac_changer core.penetration.mac_changer
+
 
 #:set standard_padding 20
 #:set standard_menu_padding 40
@@ -29,29 +32,28 @@ WindowManager:
     pos_hint: {"center_x": 0.5}
     size_hint_x: 0.5
 
+<NavigationButton@Button>:
+    size_hint: 0.2, 0.2
 
-<BackToMenuButton@Button>:
+<BackToMenuButton@NavigationButton>:
     text: "Back"
     pos_hint: {"center_x": 0.2, "top": 0.3}
-    size_hint: 0.25, 0.25
 
 
-<StartActionButton@Button>:
+<StartActionButton@NavigationButton>:
     pos_hint: {"center_x": 0.8, "y": 0.4}
-    size_hint: 0.25, 0.25
 
 
-<StopActionButton@Button>:
+<StopActionButton@NavigationButton>:
     pos_hint: {"center_x": 0.8, "top": 0.3}
-    size_hint: 0.25, 0.25
 
 # Main elements of UI.
 
+# TODO: Changing the overall layout design in windows like Change MAC
 
 <MainMenuScreen>:
     name: "main_menu_screen"
 
-    # TODO: change how the buttons are layered out or the type of Layout.
     BoxLayout:
         orientation: "vertical"
         spacing: root.height / 6
@@ -101,6 +103,8 @@ WindowManager:
 <SniffPacketsScreen>:
     name: "sniff_packets_screen"
     interface_input: interface_sniff_text_input
+    accessed_websites: accessed_websites_text_input
+    found_credentials: found_credentials_text_input
 
     BoxLayout:
         orientation: "vertical"
@@ -109,55 +113,54 @@ WindowManager:
 
         BoxLayout:
             orientation: "horizontal"
-            size_hint_y: None
+            size_hint_y: 0.1
 
             Label:
-                # TODO: remove the need for "none" variable by doing "size_hint_x".
                 text: "Interface:"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 bold: True
 
             TextInput:
                 id: interface_sniff_text_input
                 hint_text: "eth0"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 multiline: False
 
 
         GridLayout:
             cols: 2
-            padding: standard_padding
             spacing: standard_spacing
 
             Label:
-                text: "Console output:"
-                size_hint: 1, None
+                text: "Accessed websites:"
+                size_hint_y: None
                 height: standard_text_height
 
             Label:
                 text: "Found credentials:"
-                size_hint: 0.5, None
+                size_hint_y: None
                 height: standard_text_height
 
             TextInput:
-                text: "some text to copy"
+                id: accessed_websites_text_input
 
             TextInput:
-                text: "admin: password @ www.website.com"
+                id: found_credentials_text_input
                 size_hint_x: 0.5
 
 
         FloatLayout:
+            size_hint_y: 0.5
 
             StartActionButton:
                 text: "Sniff"
-                on_release: root.submit_interface()
+                on_release: threading.Thread(target=root.start_sniffing).start()
 
             StopActionButton:
                 text: "Stop"
-                # on_release: root.
+                on_release: root.stop_sniffing()
 
             BackToMenuButton:
                 on_release:
@@ -202,7 +205,6 @@ WindowManager:
     interface_input: interface_text_input
     mac_input: mac_text_input
 
-    # TODO: (optional) Separate GridLayout and improve the overall design.
     BoxLayout:
         orientation: "vertical"
 
@@ -213,64 +215,61 @@ WindowManager:
 
             Label:
                 text: "Original MAC address:"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 bold: True
 
             Label:
                 id: original_mac_label
                 text: mac_changer.get_original_mac()
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
 
             Label:
                 text: "Current MAC address:"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 bold: True
 
             Label:
                 id: current_mac_label
                 text: mac_changer.get_current_mac()
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
 
             Label:
                 text: "Interface:"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 bold: True
 
             TextInput:
                 id: interface_text_input
                 hint_text: "eth0"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 multiline: False
 
             Label:
                 text: "MAC address:"
-                size_hint: 1, None
+                size_hint_y: None
                 height: standard_text_height
                 bold: True
 
             TextInput:
                 id: mac_text_input
-                hint_text: "00:a1:b2:c3:d4:d5:"
-                size_hint: 1, None
+                hint_text: "00:aa:bb:cc:33:ff"
+                size_hint_y: None
                 height: standard_text_height
                 multiline: False
 
         FloatLayout:
 
             StartActionButton:
-                id: submit_mac_button
                 text: "Submit"
                 on_release: root.submit_mac()
 
             StopActionButton:
-                # TODO: is ID required?
-                id: revert_mac_changes_button
                 text: "Revert"
                 on_release: root.revert_mac()
 
@@ -289,10 +288,17 @@ WindowManager:
         Label:
             text: "Test"
 
-        Button:
-            text: "Back"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
-            on_release:
-                app.root.current = "penetration_tools_screen"
-                root.manager.transition.direction = "right"
+        FloatLayout:
+
+            StartActionButton:
+                text: "Spoof"
+                # on_release: root.
+
+            StopActionButton:
+                text: "Revert"
+                # on_release: root.
+
+            BackToMenuButton:
+                on_release:
+                    app.root.current = "penetration_tools_screen"
+                    root.manager.transition.direction = "right"
