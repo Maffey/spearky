@@ -6,8 +6,6 @@ import subprocess
 import re
 
 
-# TODO: implement unit tests, input validation
-
 def change_mac(interface: str, mac_address: str) -> None:
     print(f"[+] Changing the MAC address for {interface} to {mac_address}")
     subprocess.call(["ifconfig", interface, "down"])

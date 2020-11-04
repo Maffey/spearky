@@ -3,8 +3,9 @@
 #:import mac_changer core.penetration.mac_changer
 
 #:set standard_padding 20
-#:set standard_text_height 30
 #:set standard_menu_padding 40
+#:set standard_text_height 30
+#:set standard_spacing 10
 
 
 # Root widget of the app.
@@ -21,6 +22,32 @@ WindowManager:
     SpoofARPScreen:
 
 
+# Widget classes.
+
+
+<MenuButton@Button>:
+    pos_hint: {"center_x": 0.5}
+    size_hint_x: 0.5
+
+
+<BackToMenuButton@Button>:
+    text: "Back"
+    pos_hint: {"center_x": 0.2, "top": 0.3}
+    size_hint: 0.25, 0.25
+
+
+<StartActionButton@Button>:
+    pos_hint: {"center_x": 0.8, "y": 0.4}
+    size_hint: 0.25, 0.25
+
+
+<StopActionButton@Button>:
+    pos_hint: {"center_x": 0.8, "top": 0.3}
+    size_hint: 0.25, 0.25
+
+# Main elements of UI.
+
+
 <MainMenuScreen>:
     name: "main_menu_screen"
 
@@ -34,23 +61,17 @@ WindowManager:
             text: "Spearky"
             font_size: 48
 
-        Button:
+        MenuButton:
             text: "Detection Tools"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "detection_tools_screen"
                 root.manager.transition.direction = "left"
 
-        Button:
+        MenuButton:
             text: "Escalation Tools"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
 
-        Button:
+        MenuButton:
             text: "Penetration Tools"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "penetration_tools_screen"
                 root.manager.transition.direction = "left"
@@ -64,18 +85,14 @@ WindowManager:
         spacing: root.height / 4
         padding: standard_menu_padding
 
-        Button:
+        MenuButton:
             text: "Sniff Packets"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "sniff_packets_screen"
                 root.manager.transition.direction = "left"
 
-        Button:
+        MenuButton:
             text: "Back"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "main_menu_screen"
                 root.manager.transition.direction = "right"
@@ -83,20 +100,69 @@ WindowManager:
 
 <SniffPacketsScreen>:
     name: "sniff_packets_screen"
+    interface_input: interface_sniff_text_input
 
     BoxLayout:
         orientation: "vertical"
+        padding: standard_padding
+        spacing: standard_spacing
 
-        Label:
-            text: "Test"
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
 
-        Button:
-            text: "Back"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
-            on_release:
-                app.root.current = "detection_tools_screen"
-                root.manager.transition.direction = "right"
+            Label:
+                # TODO: remove the need for "none" variable by doing "size_hint_x".
+                text: "Interface:"
+                size_hint: 1, None
+                height: standard_text_height
+                bold: True
+
+            TextInput:
+                id: interface_sniff_text_input
+                hint_text: "eth0"
+                size_hint: 1, None
+                height: standard_text_height
+                multiline: False
+
+
+        GridLayout:
+            cols: 2
+            padding: standard_padding
+            spacing: standard_spacing
+
+            Label:
+                text: "Console output:"
+                size_hint: 1, None
+                height: standard_text_height
+
+            Label:
+                text: "Found credentials:"
+                size_hint: 0.5, None
+                height: standard_text_height
+
+            TextInput:
+                text: "some text to copy"
+
+            TextInput:
+                text: "admin: password @ www.website.com"
+                size_hint_x: 0.5
+
+
+        FloatLayout:
+
+            StartActionButton:
+                text: "Sniff"
+                on_release: root.submit_interface()
+
+            StopActionButton:
+                text: "Stop"
+                # on_release: root.
+
+            BackToMenuButton:
+                on_release:
+                    app.root.current = "detection_tools_screen"
+                    root.manager.transition.direction = "right"
 
 
 <EscalationToolsScreen>:
@@ -110,26 +176,20 @@ WindowManager:
         spacing: root.height / 4
         padding: standard_menu_padding
 
-        Button:
+        MenuButton:
             text: "Change MAC Address"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "change_mac_screen"
                 root.manager.transition.direction = "left"
 
-        Button:
+        MenuButton:
             text: "Spoof ARP Table"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "spoof_arp_screen"
                 root.manager.transition.direction = "left"
 
-        Button:
+        MenuButton:
             text: "Back"
-            pos_hint: {"center_x": 0.5}
-            size_hint_x: 0.5
             on_release:
                 app.root.current = "main_menu_screen"
                 root.manager.transition.direction = "right"
@@ -142,16 +202,14 @@ WindowManager:
     interface_input: interface_text_input
     mac_input: mac_text_input
 
-    size: 500, 40
-
-    # TODO: separate GridLayout and improve the overall layout
+    # TODO: (optional) Separate GridLayout and improve the overall design.
     BoxLayout:
         orientation: "vertical"
 
         GridLayout:
             cols: 2
             padding: standard_padding
-            spacing: 8
+            spacing: standard_spacing
 
             Label:
                 text: "Original MAC address:"
@@ -205,24 +263,18 @@ WindowManager:
 
         FloatLayout:
 
-            Button:
+            StartActionButton:
                 id: submit_mac_button
                 text: "Submit"
-                pos_hint: {"center_x": 0.8, "y": 0.4}
-                size_hint: 0.25, 0.25
                 on_release: root.submit_mac()
 
-            Button:
+            StopActionButton:
+                # TODO: is ID required?
                 id: revert_mac_changes_button
                 text: "Revert"
-                pos_hint: {"center_x": 0.8, "top": 0.3}
-                size_hint: 0.25, 0.25
                 on_release: root.revert_mac()
 
-            Button:
-                text: "Back"
-                pos_hint: {"center_x": 0.2, "top": 0.3}
-                size_hint: 0.25, 0.25
+            BackToMenuButton:
                 on_release:
                     app.root.current = "penetration_tools_screen"
                     root.manager.transition.direction = "right"

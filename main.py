@@ -4,9 +4,12 @@ from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 import core.penetration.mac_changer as mac_changer
+import core.detection.packet_sniffer as packet_sniffer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
+
+# TODO: Make exhaustive documentation of core scripts. Implement unit tests, input validation.
 
 
 # The WindowManager class is responsible for properly changing Screens in the app.
@@ -23,7 +26,13 @@ class DetectionToolsScreen(Screen):
 
 
 class SniffPacketsScreen(Screen):
-    pass
+    interface_input = ObjectProperty(None)
+
+    def submit_interface(self):
+        interface = self.interface_input.text
+        print(interface)
+        # TODO: this my require asynchronous job.
+        packet_sniffer.perform_sniffing(interface)
 
 
 class EscalationToolsScreen(Screen):
