@@ -9,6 +9,10 @@ from scapy.sendrecv import AsyncSniffer
 
 
 # TODO: Turn packet_sniffer into a class PacketSniffer. It will solve problems with output communication.
+class PacketSniffer:
+    pass
+
+
 def get_url(packet):
     return (packet[HTTPRequest].Host + packet[HTTPRequest].Path).decode(errors="ignore")
 
