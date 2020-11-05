@@ -6,8 +6,9 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
-import core.penetration.mac_changer as mac_changer
 import core.detection.packet_sniffer as packet_sniffer
+import core.penetration.mac_changer as mac_changer
+import core.penetration.arp_spoofer as arp_spoofer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
@@ -68,7 +69,6 @@ class PenetrationToolsScreen(Screen):
     pass
 
 
-# TODO: implement some sort of feedback for user (i.e. toast pop-up)
 class ChangeMACScreen(Screen):
     # Initialize Widgets of the class taken from .kv file.
     mac_input = ObjectProperty(None)
@@ -104,7 +104,15 @@ class ChangeMACScreen(Screen):
 
 
 class SpoofARPScreen(Screen):
-    pass
+    target_input = ObjectProperty(None)
+    gateway_input = ObjectProperty(None)
+    status = ObjectProperty(None)
+
+    def start_spoofing(self):
+        target, gateway = self.target_input.text, self.gateway_input.text
+        self.target_input.text = ""
+        self.gateway_input.text = ""
+        arp_spoofer.perform_spoofing(target, gateway)
 
 
 class SpearkyApp(App):

@@ -297,22 +297,67 @@ WindowManager:
 
 <SpoofARPScreen>:
     name: "spoof_arp_screen"
+    target_input: target_text_input
+    gateway_input: gateway_text_input
+    status: status_label
 
     BoxLayout:
         orientation: "vertical"
 
-        Label:
-            text: "Test"
+        GridLayout:
+            cols: 2
+            padding: standard_padding
+            spacing: standard_spacing
+
+            Label:
+                text: "Target device IP:"
+                size_hint_y: None
+                height: standard_text_height
+                bold: True
+
+            TextInput:
+                id: target_text_input
+                hint_text: "192.168.0.x"
+                size_hint_y: None
+                height: standard_text_height
+                multiline: False
+
+            Label:
+                text: "Gateway IP:"
+                size_hint_y: None
+                height: standard_text_height
+                bold: True
+
+            TextInput:
+                id: gateway_text_input
+                hint_text: "192.168.0.1"
+                size_hint_y: None
+                height: standard_text_height
+                multiline: False
 
         FloatLayout:
 
             StartActionButton:
                 text: "Spoof"
-                # on_release: root.
+                on_release: root.start_spoofing()
 
             StopActionButton:
-                text: "Revert"
+                text: "Stop"
                 # on_release: root.
+
+            BoxLayout:
+                # TODO: Change colors based on status.
+                orientation: "horizontal"
+                size_hint: 0.2, 0.2
+                pos_hint: {"center_x": 0.2, "y": 0.4}
+
+                Label:
+                    text: "Status:"
+                    bold: True
+
+                Label:
+                    id: status_label
+                    text: "status_text"
 
             BackToMenuButton:
                 on_release:

