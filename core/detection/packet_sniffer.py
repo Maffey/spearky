@@ -9,8 +9,12 @@ from scapy.sendrecv import AsyncSniffer
 
 
 # TODO: Turn packet_sniffer into a class PacketSniffer. It will solve problems with output communication.
-class PacketSniffer:
-    pass
+# TODO (optional): Maybe extend based on Async Sniffer?
+class PacketSniffer(AsyncSniffer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.console_output = []
+        self.credentials = []
 
 
 def get_url(packet):
