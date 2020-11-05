@@ -35,7 +35,7 @@ class SniffPacketsScreen(Screen):
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
-    accessed_websites = ObjectProperty(None)
+    terminal_output = ObjectProperty(None)
     found_credentials = ObjectProperty(None)
     sniffer = None
 
@@ -51,16 +51,19 @@ class SniffPacketsScreen(Screen):
         print("[+] Sniffing has been started.")
 
     # TODO: implement continuous sniffing output in the future. Use Clock for this.
-    # TODO: it crashes when sniffing hasn't been started first.
     def stop_sniffing(self):
-        self.sniffer.stop()
-        print("[+] Sniffing has been stopped.")
-        with open("data/sniffing_log.txt", "r+") as log_file:
-            self.accessed_websites.text = log_file.read()
-            log_file.truncate(0)
-        with open("data/sniffing_credentials.txt", "r+") as log_file:
-            self.found_credentials.text = log_file.read()
-            log_file.truncate(0)
+        if self.sniffer.running:
+            self.sniffer.stop()
+            print("[+] Sniffing has been stopped.")
+            with open("data/sniffing_log.txt", "r+") as log_file:
+                self.terminal_output.text = log_file.read()
+                log_file.truncate(0)
+            with open("data/sniffing_credentials.txt", "r+") as log_file:
+                self.found_credentials.text = log_file.read()
+                log_file.truncate(0)
+        else:
+            show_feedback_popup("Packet Sniffing Warning",
+                                "The packet sniffing has not yet started. It can't be stopped.")
 
 
 class EscalationToolsScreen(Screen):

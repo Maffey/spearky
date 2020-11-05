@@ -119,7 +119,7 @@ WindowManager:
 <SniffPacketsScreen>:
     name: "sniff_packets_screen"
     interface_input: interface_sniff_text_input
-    accessed_websites: accessed_websites_text_input
+    terminal_output: terminal_output_text_input
     found_credentials: found_credentials_text_input
 
     BoxLayout:
@@ -150,7 +150,7 @@ WindowManager:
             spacing: standard_spacing
 
             Label:
-                text: "Accessed websites:"
+                text: "Terminal output:"
                 size_hint_y: None
                 height: standard_text_height
 
@@ -160,7 +160,7 @@ WindowManager:
                 height: standard_text_height
 
             TextInput:
-                id: accessed_websites_text_input
+                id: terminal_output_text_input
 
             TextInput:
                 id: found_credentials_text_input

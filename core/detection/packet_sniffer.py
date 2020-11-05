@@ -8,6 +8,7 @@ from scapy.layers.http import HTTPRequest
 from scapy.sendrecv import AsyncSniffer
 
 
+# TODO: Turn packet_sniffer into a class PacketSniffer. It will solve problems with output communication.
 def get_url(packet):
     return (packet[HTTPRequest].Host + packet[HTTPRequest].Path).decode(errors="ignore")
 
@@ -21,7 +22,7 @@ def get_login_info(packet):
             return load
 
 
-# TODO (optional): store in variable, send variable to main kivy loop.
+# TODO: store in variable, send variable to main kivy loop.
 def write_log_entry(entry):
     with open("data/sniffing_log.txt", "a") as log_file:
         log_file.write(entry + "\n")
