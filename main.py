@@ -1,6 +1,9 @@
 import kivy
 from kivy.app import App
 from kivy.properties import ObjectProperty
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 import core.penetration.mac_changer as mac_changer
@@ -78,7 +81,7 @@ class ChangeMACScreen(Screen):
 
     def submit_mac(self):
         # Store inputs in additional variables to allow us to clear Text Inputs instantly.
-        # TODO: Handle errors. Use default interface if none was provided.
+        # TODO: Handle errors. Use default interface if none was provided. Add error popups.
         interface, mac_address = self.interface_input.text, self.mac_input.text
         self.current_interface = interface
         self.mac_input.text = ""
@@ -86,6 +89,7 @@ class ChangeMACScreen(Screen):
 
         # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(interface, mac_address)
+        show_feedback_popup("MAC Change Successful", "MAC change performed successfully.")
 
     def revert_mac(self):
         """Restores computer's MAC address to original one."""
@@ -96,6 +100,7 @@ class ChangeMACScreen(Screen):
 
         # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(self.current_interface, self.original_mac.text)
+        show_feedback_popup("MAC Revert Successful", "MAC address has been restored to the original one.")
 
 
 class SpoofARPScreen(Screen):
@@ -104,6 +109,18 @@ class SpoofARPScreen(Screen):
 
 class SpearkyApp(App):
     pass
+
+
+# The class below is the generic Popup Widget that will be used to provide user with feedback.
+class FeedbackPopup(Popup):
+    feedback_text = ObjectProperty(None)
+
+
+# This method works with FeedbackPopup class. Creates Popup window based on a template with w
+def show_feedback_popup(title, content_text, size=(350, 200)):
+    popup = FeedbackPopup(title=title, size_hint=(None, None), size=size)
+    popup.feedback_text.text = content_text
+    popup.open()
 
 
 if __name__ == '__main__':

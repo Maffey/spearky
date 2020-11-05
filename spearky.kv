@@ -26,8 +26,6 @@ WindowManager:
 
 
 # Widget classes.
-
-
 <MenuButton@Button>:
     pos_hint: {"center_x": 0.5}
     size_hint_x: 0.5
@@ -39,16 +37,34 @@ WindowManager:
     text: "Back"
     pos_hint: {"center_x": 0.2, "top": 0.3}
 
-
 <StartActionButton@NavigationButton>:
     pos_hint: {"center_x": 0.8, "y": 0.4}
-
 
 <StopActionButton@NavigationButton>:
     pos_hint: {"center_x": 0.8, "top": 0.3}
 
-# Main elements of UI.
+<FeedbackPopup@Popup>:
+    feedback_text: feedback_content_label
+    title: "Feedback Popup"
 
+    FloatLayout:
+
+        Label:
+            id: feedback_content_label
+            text: "Action performed successfully."
+            size_hint: 0.6, None
+            pos_hint: {"center_x": 0.5, "top": 0.9}
+            text_size: self.width, None
+            height: self.texture_size[1]
+            halign: "center"
+
+        Button:
+            text: "Close"
+            size_hint: 0.6, 0.2
+            pos_hint: {"center_x": 0.5, "y": 0.1}
+            on_press: root.dismiss()
+
+# Main elements of UI.
 # TODO: Changing the overall layout design in windows like Change MAC
 
 <MainMenuScreen>:
