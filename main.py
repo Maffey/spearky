@@ -1,4 +1,6 @@
 import kivy
+import subprocess
+
 from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -100,7 +102,7 @@ class ChangeMACScreen(Screen):
 
         # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(self.current_interface, self.original_mac.text)
-        show_feedback_popup("MAC Revert Successful", "MAC address has been restored to the original one.")
+        show_feedback_popup("MAC Reversing Successful", "MAC address has been restored to the original one.")
 
 
 class SpoofARPScreen(Screen):
@@ -108,11 +110,13 @@ class SpoofARPScreen(Screen):
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
 
+    # TODO: Add threading.
     def start_spoofing(self):
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
         arp_spoofer.perform_spoofing(target, gateway)
+        show_feedback_popup("ARP Spoofing", "ARP spoofing has been started successfully.")
 
 
 class SpearkyApp(App):
@@ -131,5 +135,7 @@ def show_feedback_popup(title, content_text, size=(350, 200)):
     popup.open()
 
 
+# Runs when the App starts.
 if __name__ == '__main__':
+    subprocess.call(["echo", "1", ">", "/proc/sys/net/ipv4/ip_forward"])
     SpearkyApp().run()
