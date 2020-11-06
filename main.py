@@ -115,6 +115,7 @@ class SpoofARPScreen(Screen):
 
     # TODO: Add threading.
     def start_spoofing(self):
+        self.status.text = "Running..."
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
