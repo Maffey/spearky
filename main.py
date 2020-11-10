@@ -1,6 +1,8 @@
+# Main imports
 import kivy
 import subprocess
 
+# Specific imports from kivy
 from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -8,6 +10,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+# Imports of the core functionality of the Spearky app.
 import core.detection.packet_sniffer as packet_sniffer
 import core.penetration.mac_changer as mac_changer
 import core.penetration.arp_spoofer as arp_spoofer
@@ -20,18 +23,23 @@ kivy.require('1.11.1')
 
 # The WindowManager class is responsible for properly changing Screens in the app.
 class WindowManager(ScreenManager):
+    """Coordinate all the Screen changes throughout the app."""
     pass
 
 
 class MainMenuScreen(Screen):
+    """Display the main menu of the app."""
     pass
 
 
 class DetectionToolsScreen(Screen):
+    """Display all the tools in Detection category."""
     pass
 
 
 class SniffPacketsScreen(Screen):
+    """Sniff packets asynchronously and find any potential """
+    
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
