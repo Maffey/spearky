@@ -1,8 +1,10 @@
-# Main imports
-import kivy
+"""Spearky - penetration testing app with GUI developed in Kivy."""
+
+# Common modules
 import subprocess
 
-# Specific imports from kivy
+# Kivy module
+import kivy
 from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -10,10 +12,10 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
-# Imports of the core functionality of the Spearky app.
-import core.detection.packet_sniffer as packet_sniffer
+# Modules containing the core functionality of the Spearky app.
 import core.penetration.mac_changer as mac_changer
 import core.penetration.arp_spoofer as arp_spoofer
+from core.detection.packet_sniffer import PacketSniffer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
@@ -23,7 +25,7 @@ kivy.require('1.11.1')
 
 # The WindowManager class is responsible for properly changing Screens in the app.
 class WindowManager(ScreenManager):
-    """Coordinate all the Screen changes throughout the app."""
+    """Coordinate all the Screens and changes between them throughout the app."""
     pass
 
 
@@ -38,51 +40,74 @@ class DetectionToolsScreen(Screen):
 
 
 class SniffPacketsScreen(Screen):
-    """Sniff packets asynchronously and find any potential """
+    """Sniff packets asynchronously and find any potential login credentials.
+
+    Attributes:
+        interface_input - Text Input for entering network interface
+        terminal_output - Text Input for displaying output from terminal
+        found_credentials - Text Input for displaying credentials found in terminal's output
+
+    Methods:
+        start_sniffing() - run after pressing "Sniff" Button
+        stop_sniffing() - run after pressing "Stop" Button
+    """
     
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
     terminal_output = ObjectProperty(None)
     found_credentials = ObjectProperty(None)
-    sniffer = None
+    sniffer = PacketSniffer()
 
     def start_sniffing(self):
-        interface = self.interface_input.text
-        if interface == "":
-            self.sniffer = packet_sniffer.create_sniffer()
-        else:
-            self.sniffer = packet_sniffer.create_sniffer(interface)
-        self.sniffer.start()
+        """Start sniffing by either using default interface (eth0) or the one provided by the user."""
+        # Clear text fields for displaying output.
+        self.terminal_output.text, self.found_credentials.text = "", ""
 
+        # Store inputted interface in a variable.
+        interface = self.interface_input.text
+        # Clear text in interface field.
         self.interface_input.text = ""
+
+        # If user provided no variable, use default one (eth0)
+        if interface == "":
+            self.sniffer = PacketSniffer()
+        else:
+            self.sniffer = PacketSniffer(interface=interface)
+        # Start sniffing by calling scapy's AsyncSniffer contained in PacketSniffer object.
+        self.sniffer.start_sniffer()
+
         print("[+] Sniffing has been started.")
 
     # TODO: implement continuous sniffing output in the future. Use Clock for this.
     def stop_sniffing(self):
-        if self.sniffer.running:
-            self.sniffer.stop()
+        """Stop sniffing or display message indicating that sniffer hasn't been started yet."""
+        # If PacketSniffer is running, stop it, display final output in the text fields
+        # and clear PacketSniffer's attributes containing said output.
+        # If it isn't running, display appropriate message.
+        if self.sniffer.is_running():
+            self.sniffer.stop_sniffer()
             print("[+] Sniffing has been stopped.")
-            with open("data/sniffing_log.txt", "r+") as log_file:
-                self.terminal_output.text = log_file.read()
-                log_file.truncate(0)
-            with open("data/sniffing_credentials.txt", "r+") as log_file:
-                self.found_credentials.text = log_file.read()
-                log_file.truncate(0)
+            self.terminal_output.text = "\n".join(self.sniffer.console_output)
+            self.found_credentials.text = "\n".join(self.sniffer.credentials)
+            self.sniffer.console_output, self.sniffer.credentials = [], []
         else:
             show_feedback_popup("Packet Sniffing Warning",
                                 "The packet sniffing has not yet started. It can't be stopped.")
 
 
 class EscalationToolsScreen(Screen):
+    """Display all the tools in Escalation category."""
     pass
 
 
 class PenetrationToolsScreen(Screen):
+    """Display all the tools in Penetration category."""
     pass
 
 
 class ChangeMACScreen(Screen):
+    """Change current MAC address to the one inputted. Display default MAC address and possibly, revert the changes."""
     # Initialize Widgets of the class taken from .kv file.
     mac_input = ObjectProperty(None)
     interface_input = ObjectProperty(None)
@@ -93,6 +118,7 @@ class ChangeMACScreen(Screen):
     current_interface = "eth0"
 
     def submit_mac(self):
+        """Take strings from input fields and use them as arguments for performing MAC address change."""
         # Store inputs in additional variables to allow us to clear Text Inputs instantly.
         # TODO: Handle errors. Use default interface if none was provided. Add error popups.
         interface, mac_address = self.interface_input.text, self.mac_input.text
@@ -105,7 +131,7 @@ class ChangeMACScreen(Screen):
         show_feedback_popup("MAC Change Successful", "MAC change performed successfully.")
 
     def revert_mac(self):
-        """Restores computer's MAC address to original one."""
+        """Restores computer's MAC address to the original one."""
         self.mac_input.text = ""
         self.interface_input.text = ""
 
@@ -117,12 +143,14 @@ class ChangeMACScreen(Screen):
 
 
 class SpoofARPScreen(Screen):
+    """Spoof ARP table and display the process' status to the user."""
     target_input = ObjectProperty(None)
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
 
     # TODO: Add threading.
     def start_spoofing(self):
+        """Start spoofing ARP table between chosen targets."""
         self.status.text = "Running..."
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
@@ -132,22 +160,23 @@ class SpoofARPScreen(Screen):
 
 
 class SpearkyApp(App):
+    """Root class that represents the whole App."""
     pass
 
 
-# The class below is the generic Popup Widget that will be used to provide user with feedback.
 class FeedbackPopup(Popup):
+    """Generic Popup that is used to provide user with feedback."""
     feedback_text = ObjectProperty(None)
 
 
-# This method works with FeedbackPopup class. Creates Popup window based on a template with w
 def show_feedback_popup(title, content_text, size=(350, 200)):
+    """Create FeedbackPopup based on provided arguments and display it."""
     popup = FeedbackPopup(title=title, size_hint=(None, None), size=size)
     popup.feedback_text.text = content_text
     popup.open()
 
 
-# Runs when the App starts.
+# Run when App starts.
 if __name__ == '__main__':
     subprocess.call(["echo", "1", ">", "/proc/sys/net/ipv4/ip_forward"])
     SpearkyApp().run()

