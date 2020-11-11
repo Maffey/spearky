@@ -80,6 +80,8 @@ class SniffPacketsScreen(Screen):
         # Start sniffing by calling scapy's AsyncSniffer contained in PacketSniffer object.
         self.sniffer.start_sniffer()
 
+        # Schedule an update of displayed text fields every second.
+        # NOTE: This most likely doesn't stop after stopping sniffing and might use resources unnecessarily.
         Clock.schedule_interval(self.update_output_fields, 1)
 
         # Display information to user that sniffing has been started.
