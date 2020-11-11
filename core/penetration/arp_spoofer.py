@@ -6,6 +6,8 @@ import time
 import scapy.all as scapy
 import argparse
 
+# TODO: Implement OOJ to control flow of the spoofing (i.e. when to stop).
+
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Performs a man-in-the-middle attack between two given IP addresses.")
@@ -50,6 +52,11 @@ def restore(destination_ip, source_ip):
     scapy.send(packet, count=4, verbose=False)
 
 
+def stop_spoofing(target_ip, gateway_ip):
+    restore(target_ip, gateway_ip)
+    restore(gateway_ip, target_ip)
+
+
 # TODO: Separate it somehow to have the ability to stop spoofing.
 def perform_spoofing(target_ip, gateway_ip):
     sent_packets_count = 0
@@ -58,9 +65,9 @@ def perform_spoofing(target_ip, gateway_ip):
             spoof(target_ip, gateway_ip)
             spoof(gateway_ip, target_ip)
             sent_packets_count += 2
+            # NOTE: Remember that while working on threads, the console output won't be displayed unless in debug mode.
             print(f"[+] Sending 2 packets regularly... Total packets sent: {sent_packets_count}", end="\r")
             time.sleep(2)
     except KeyboardInterrupt:
         print("\n[+] Execution aborted. Restoring ARP tables...")
-        restore(target_ip, gateway_ip)
-        restore(gateway_ip, target_ip)
+        stop_spoofing(target_ip, gateway_ip)

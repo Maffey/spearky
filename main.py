@@ -4,6 +4,8 @@
 import subprocess
 
 # Kivy module
+from threading import Thread
+
 import kivy
 from kivy.app import App
 from kivy.clock import Clock
@@ -167,6 +169,8 @@ class SpoofARPScreen(Screen):
     target_input = ObjectProperty(None)
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
+    # TODO: test if you can just change its attributes.
+    spoofing_thread = Thread(daemon=True)
 
     # TODO: Add threading.
     def start_spoofing(self):
@@ -175,8 +179,14 @@ class SpoofARPScreen(Screen):
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
-        arp_spoofer.perform_spoofing(target, gateway)
-        show_feedback_popup("ARP Spoofing", "ARP spoofing has been started successfully.")
+        # show_feedback_popup("ARP Spoofing", "ARP spoofing has been started successfully.")
+        self.spoofing_thread = Thread(target=arp_spoofer.perform_spoofing, args=(target, gateway), daemon=True)
+        self.spoofing_thread.start()
+
+    def stop_spoofing(self):
+        # TODO: add proper stopping.
+        self.spoofing_thread.join()
+        self.status.text = "Stopped."
 
 
 class SpearkyApp(App):
@@ -196,7 +206,7 @@ def show_feedback_popup(title, content_text, size=(350, 200)):
     popup.open()
 
 
-# Run when App starts.
+# Execute to start the app with preconfigured packets forwarding.
 if __name__ == '__main__':
     subprocess.call(["echo", "1", ">", "/proc/sys/net/ipv4/ip_forward"])
     SpearkyApp().run()
