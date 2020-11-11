@@ -180,12 +180,12 @@ class SpoofARPScreen(Screen):
         self.target_input.text = ""
         self.gateway_input.text = ""
         # show_feedback_popup("ARP Spoofing", "ARP spoofing has been started successfully.")
-        self.spoofing_thread = Thread(target=arp_spoofer.perform_spoofing, args=(target, gateway), daemon=True)
+        self.spoofing_thread = Thread(target=arp_spoofer.start_spoofing, args=(target, gateway), daemon=True)
         self.spoofing_thread.start()
 
     def stop_spoofing(self):
         # TODO: add proper stopping.
-        self.spoofing_thread.join()
+        # self.spoofing_thread.join()
         self.status.text = "Stopped."
 
 

