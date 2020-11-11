@@ -47,10 +47,12 @@ class SniffPacketsScreen(Screen):
         interface_input - Text Input for entering network interface
         terminal_output - Text Input for displaying output from terminal
         found_credentials - Text Input for displaying credentials found in terminal's output
+        sniffer - PacketSniffer object responsible for starting and stopping sniffing.
 
     Methods:
         start_sniffing() - run after pressing "Sniff" Button
         stop_sniffing() - run after pressing "Stop" Button
+        update_output_fields() - task scheduled by Clock to update output in the text fields
     """
     
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
@@ -59,7 +61,6 @@ class SniffPacketsScreen(Screen):
     terminal_output = ObjectProperty(None)
     found_credentials = ObjectProperty(None)
     sniffer = PacketSniffer()
-    # update_event = Clock.schedule_interval(update_output_fields)
 
     def start_sniffing(self):
         """Start sniffing by either using default interface (eth0) or the one provided by the user."""
@@ -88,7 +89,6 @@ class SniffPacketsScreen(Screen):
         print("[+] Sniffing has been started.")
         show_feedback_popup("Packet Sniffing Started", "Sniffing packets has been started.")
 
-    # TODO: implement continuous sniffing output in the future. Use Clock for this.
     def stop_sniffing(self):
         """Stop sniffing or display message indicating that sniffer hasn't been started yet."""
         # If PacketSniffer is running, stop it, display final output in the text fields
