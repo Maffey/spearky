@@ -6,6 +6,7 @@ import subprocess
 # Kivy module
 import kivy
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
@@ -58,6 +59,7 @@ class SniffPacketsScreen(Screen):
     terminal_output = ObjectProperty(None)
     found_credentials = ObjectProperty(None)
     sniffer = PacketSniffer()
+    # update_event = Clock.schedule_interval(update_output_fields)
 
     def start_sniffing(self):
         """Start sniffing by either using default interface (eth0) or the one provided by the user."""
@@ -74,10 +76,15 @@ class SniffPacketsScreen(Screen):
             self.sniffer = PacketSniffer()
         else:
             self.sniffer = PacketSniffer(interface=interface)
+
         # Start sniffing by calling scapy's AsyncSniffer contained in PacketSniffer object.
         self.sniffer.start_sniffer()
 
+        Clock.schedule_interval(self.update_output_fields, 1)
+
+        # Display information to user that sniffing has been started.
         print("[+] Sniffing has been started.")
+        show_feedback_popup("Packet Sniffing Started", "Sniffing packets has been started.")
 
     # TODO: implement continuous sniffing output in the future. Use Clock for this.
     def stop_sniffing(self):
@@ -88,12 +95,23 @@ class SniffPacketsScreen(Screen):
         if self.sniffer.is_running():
             self.sniffer.stop_sniffer()
             print("[+] Sniffing has been stopped.")
-            self.terminal_output.text = "\n".join(self.sniffer.console_output)
-            self.found_credentials.text = "\n".join(self.sniffer.credentials)
+            self.terminal_output.text += "\n".join(self.sniffer.console_output) + "\n"
+            self.found_credentials.text += "\n".join(self.sniffer.credentials) + "\n"
             self.sniffer.console_output, self.sniffer.credentials = [], []
         else:
             show_feedback_popup("Packet Sniffing Warning",
                                 "The packet sniffing has not yet started. It can't be stopped.")
+
+    def update_output_fields(self, dt):
+        """Update output fields with found information and clear PacketSniffer's attributes."""
+        # If there's content stored in console_output, display it in the text fields.
+        if self.sniffer.console_output:
+            self.terminal_output.text += "\n".join(self.sniffer.console_output) + "\n"
+            self.sniffer.console_output = []
+        # If there's content stored in credentials, display it in the text fields.
+        if self.sniffer.credentials:
+            self.found_credentials.text += "\n".join(self.sniffer.credentials) + "\n"
+            self.sniffer.credentials = []
 
 
 class EscalationToolsScreen(Screen):

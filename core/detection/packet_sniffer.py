@@ -33,7 +33,7 @@ class PacketSniffer:
             self.console_output.append(url)
             login_info = get_login_info(packet)
             if login_info:
-                self.console_output.append(login_info)
+                self.console_output.append("[LOGIN INFO]: " + login_info)
                 self.credentials.append(login_info)
 
     def start_sniffer(self):
