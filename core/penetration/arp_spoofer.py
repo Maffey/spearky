@@ -1,11 +1,10 @@
-#! /usr/bin/env python
-# arp_spoofer.py - ARP spoofer that performs a man-in-the-middle attack through disguise between chosen two devices.
-# Compatibility: Python 3.x
+"""arp_spoofer.py - ARP spoofer that performs a man-in-the-middle attack through disguise between chosen two devices."""
 
 import time
 import scapy.all as scapy
 
 # TODO: Implement OOJ to control flow of the spoofing (i.e. when to stop).
+
 
 class ARPSpoofer:
     def __init__(self, target_ip, gateway_ip):
@@ -15,6 +14,8 @@ class ARPSpoofer:
 
 
 def get_mac(ip):
+    # TODO: Fix this ARP highlight thing in scapy.
+    # https://stackoverflow.com/questions/63645535/arp-in-scapy-not-working-and-getting-an-error-cannot-find-reference-arp-in-a
     arp_request = scapy.ARP(pdst=ip)
     broadcast_frame = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arp_packet = broadcast_frame / arp_request

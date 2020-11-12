@@ -1,12 +1,9 @@
 """Spearky - penetration testing app with GUI developed in Kivy."""
 
-# Common modules
+# Imported external modules
 import subprocess
-
-# Kivy module
-from threading import Thread
-
 import kivy
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
@@ -14,6 +11,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
+from threading import Thread
 
 # Modules containing the core functionality of the Spearky app.
 import core.penetration.mac_changer as mac_changer
@@ -22,6 +20,7 @@ from core.detection.packet_sniffer import PacketSniffer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
+# Python: 3.7
 
 # TODO: Make exhaustive documentation of core scripts. Implement unit tests, input validation.
 
@@ -49,12 +48,12 @@ class SniffPacketsScreen(Screen):
         interface_input - Text Input for entering network interface
         terminal_output - Text Input for displaying output from terminal
         found_credentials - Text Input for displaying credentials found in terminal's output
-        sniffer - PacketSniffer object responsible for starting and stopping sniffing.
+        sniffer - PacketSniffer object responsible for starting and stopping sniffing
 
     Methods:
         start_sniffing() - run after pressing "Sniff" Button
         stop_sniffing() - run after pressing "Stop" Button
-        update_output_fields() - task scheduled by Clock to update output in the text fields
+        update_output_fields(dt) - task scheduled by Clock to update output in the text fields
     """
     
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
@@ -107,7 +106,12 @@ class SniffPacketsScreen(Screen):
                                 "The packet sniffing has not yet started. It can't be stopped.")
 
     def update_output_fields(self, dt):
-        """Update output fields with found information and clear PacketSniffer's attributes."""
+        """Update output fields with found information and clear PacketSniffer's attributes.
+
+        Attributes:
+            dt - delta time, required and used by Clock
+        """
+
         # If there's content stored in console_output, display it in the text fields.
         if self.sniffer.console_output:
             self.terminal_output.text += "\n".join(self.sniffer.console_output) + "\n"
@@ -174,16 +178,16 @@ class SpoofARPScreen(Screen):
 
     # TODO: Add threading.
     def start_spoofing(self):
-        """Start spoofing ARP table between chosen targets."""
+        """Start spoofing ARP table between chosen targets and display information it started."""
         self.status.text = "Running..."
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
-        # show_feedback_popup("ARP Spoofing", "ARP spoofing has been started successfully.")
         self.spoofing_thread = Thread(target=arp_spoofer.start_spoofing, args=(target, gateway), daemon=True)
         self.spoofing_thread.start()
 
     def stop_spoofing(self):
+        """Stop spoofing ARP table between chosen targets and display information it stopped."""
         # TODO: add proper stopping.
         # self.spoofing_thread.join()
         self.status.text = "Stopped."
