@@ -15,8 +15,8 @@ from threading import Thread
 
 # Modules containing the core functionality of the Spearky app.
 import core.penetration.mac_changer as mac_changer
-import core.penetration.arp_spoofer as arp_spoofer
 from core.detection.packet_sniffer import PacketSniffer
+from core.penetration.arp_spoofer import ARPSpoofer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
@@ -55,7 +55,9 @@ class SniffPacketsScreen(Screen):
         stop_sniffing() - run after pressing "Stop" Button
         update_output_fields(dt) - task scheduled by Clock to update output in the text fields
     """
-    
+
+    # It's important to note that variables below are class' attributes, not instance's of the class.
+    # This works fine in the case of Kivy.
     # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
@@ -173,24 +175,30 @@ class SpoofARPScreen(Screen):
     target_input = ObjectProperty(None)
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
-    # TODO: test if you can just change its attributes.
-    spoofing_thread = Thread(daemon=True)
+    spoofing_thread = Thread()
+    spoofer = object
 
-    # TODO: Add threading.
     def start_spoofing(self):
         """Start spoofing ARP table between chosen targets and display information it started."""
         self.status.text = "Running..."
+        # TODO: Change color of status.
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
-        self.spoofing_thread = Thread(target=arp_spoofer.start_spoofing, args=(target, gateway), daemon=True)
+        self.spoofer = ARPSpoofer(target, gateway)
+        self.spoofing_thread = Thread(target=self.spoofer.start_spoofing)
         self.spoofing_thread.start()
 
     def stop_spoofing(self):
         """Stop spoofing ARP table between chosen targets and display information it stopped."""
-        # TODO: add proper stopping.
-        # self.spoofing_thread.join()
-        self.status.text = "Stopped."
+        # Inform user the program is currently trying to stop.
+        self.status.text = "Stopping..."
+        # Call method to stop spoofing.
+        self.spoofer.stop_spoofing()
+        # Call a thread to join with the main thread.
+        self.spoofing_thread.join()
+        # Display information indicating successful halt of spoofing.
+        self.status.text = "Stopped"
 
 
 class SpearkyApp(App):
