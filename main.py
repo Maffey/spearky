@@ -181,7 +181,7 @@ class SpoofARPScreen(Screen):
     def start_spoofing(self):
         """Start spoofing ARP table between chosen targets and display information it started."""
         self.status.text = "Running..."
-        # TODO: Change color of status.
+        # TODO: Change color of status for better visual feedback.
         target, gateway = self.target_input.text, self.gateway_input.text
         self.target_input.text = ""
         self.gateway_input.text = ""
