@@ -7,8 +7,6 @@ import kivy
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from threading import Thread

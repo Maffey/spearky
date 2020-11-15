@@ -65,7 +65,6 @@ WindowManager:
             on_press: root.dismiss()
 
 # Main elements of UI.
-# TODO: Changing the overall layout design in windows like Change MAC
 
 <MainMenuScreen>:
     name: "main_menu_screen"
@@ -353,6 +352,7 @@ WindowManager:
                 orientation: "horizontal"
                 size_hint: 0.2, 0.2
                 pos_hint: {"center_x": 0.2, "y": 0.4}
+                padding: standard_padding / 2
 
                 Label:
                     text: "Status:"
@@ -361,6 +361,12 @@ WindowManager:
                 Label:
                     id: status_label
                     text: "Off"
+                    canvas:
+                        Color:
+                            rgba: 1, 1, 1, 1,
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
 
             BackToMenuButton:
                 on_release:
