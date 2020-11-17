@@ -6,7 +6,6 @@ import scapy.all as scapy
 
 def get_mac(ip_address: str) -> str:
     """Get MAC address of the device in the network that has provided IP address by sending ARP request."""
-    # TODO: Fix this ARP highlight thing in scapy.
     # https://stackoverflow.com/questions/63645535/arp-in-scapy-not-working-and-getting-an-error-cannot-find-reference-arp-in-a
     arp_request = scapy.ARP(pdst=ip_address)
     broadcast_frame = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
@@ -55,7 +54,7 @@ class ARPSpoofer:
 
     def get_default_gateway(self) -> str:
         """Take target's IP address and return the default gateway's IP address based on that (naive approach)."""
-        # TODO: Get default gateway by using commands and regex?
+        # TODO (low priority): Get default gateway by using commands and regex?
         address = self.target_ip.split(".")
         address[3] = "1"
         gateway_ip = ".".join(address)

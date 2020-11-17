@@ -2,22 +2,21 @@
 
 # Imported external modules
 import subprocess
-import time
 
 import kivy
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.graphics.context_instructions import Color
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from threading import Thread
 
 # Modules containing the core functionality of the Spearky app.
-import core.penetration.mac_changer as mac_changer
-from core.detection.packet_sniffer import PacketSniffer
-from core.penetration.arp_spoofer import ARPSpoofer
+import core.penetration_tools.mac_changer as mac_changer
+from core.detection_tools.packet_sniffer import PacketSniffer
+from core.escalation_tools.backdoor_listener import BackdoorListener
+from core.penetration_tools.arp_spoofer import ARPSpoofer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
@@ -131,6 +130,24 @@ class EscalationToolsScreen(Screen):
     pass
 
 
+class BackdoorListenerScreen(Screen):
+    """Listen for incoming connections from installed backdoors."""
+    ip_address = ObjectProperty(None)
+    terminal = ObjectProperty(None)
+    command_line = ObjectProperty(None)
+    # TODO: can't make empty constructor so just do object. Will need to implement Exception handling in case when
+    #  backdoor connection is stopped before starting.
+    backdoor_listener = object
+
+    # TODO: implement this. make status show IP which listener is connected to.
+    #  Add threading and proper exit functionality.
+    def start_listener(self):
+        pass
+
+    def stop_listener(self):
+        pass
+
+
 class PenetrationToolsScreen(Screen):
     """Display all the tools in Penetration category."""
     pass
@@ -193,8 +210,8 @@ class SpoofARPScreen(Screen):
         """Start spoofing ARP table between chosen targets and display information it started."""
         # Change text and color of status for visual feedback.
         self.status.text = "running..."
-        self.status.color = (0, 0, 0, 1)
-        self.status.background_color = (0, 1, 0, 1)
+        self.status.color = (0, 0, 0, 1)  # black
+        self.status.background_color = (0, 1, 0, 1)  # green
         # Save target's IP and gateway's IP into variables, cutting spaces.
         target, gateway = self.target_input.text.strip(), self.gateway_input.text.strip()
         # Clear Text Input fields.
@@ -209,14 +226,14 @@ class SpoofARPScreen(Screen):
         else:
             show_feedback_popup("ARP Spoofing Error", "IP addresses have not been provided correctly.")
             self.status.text = "ERROR"
-            self.status.background_color = (1, 0, 0, 1)
+            self.status.background_color = (1, 0, 0, 1)  # red
 
     def stop_spoofing(self):
         """Stop spoofing ARP table between chosen targets and display information it stopped."""
         # Inform about process of stopping.
         self.status.text = "stopping.."
-        self.status.color = (0, 0, 0, 1)
-        self.status.background_color = (245 / 255, 171 / 255, 53 / 255, 1)
+        self.status.color = (0, 0, 0, 1)  # black
+        self.status.background_color = (245 / 255, 171 / 255, 53 / 255, 1)  # orange
         # Call method to stop spoofing if its running.
         if self.spoofer.running:
             self.spoofer.stop_spoofing()
@@ -224,8 +241,8 @@ class SpoofARPScreen(Screen):
             self.spoofing_thread.join()
             # Display information indicating successful halt of spoofing.
             self.status.text = "stopped"
-            self.status.color = (1, 1, 1, 1)
-            self.status.background_color = (0, 0, 0, 1)
+            self.status.color = (1, 1, 1, 1)  # white
+            self.status.background_color = (0, 0, 0, 1)  # black
         else:
             show_feedback_popup("ARP Spoofing Stop", "ARP have not been started yet.")
 
