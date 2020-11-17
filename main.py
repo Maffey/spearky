@@ -59,7 +59,7 @@ class SniffPacketsScreen(Screen):
 
     # It's important to note that variables below are class' attributes, not instance's of the class.
     # This works fine in the case of Kivy.
-    # TODO: Try to use a list of interfaces instead. Some way of getting interface names would be needed.
+    # TODO (low priority): Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
     interface_input = ObjectProperty(None)
     terminal_output = ObjectProperty(None)

