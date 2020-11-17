@@ -23,7 +23,7 @@ from core.penetration.arp_spoofer import ARPSpoofer
 kivy.require('1.11.1')
 # Python: 3.7
 
-# TODO: Implement unit tests, input validation.
+# TODO (medium priority): Implement unit tests, input validation.
 
 
 # The WindowManager class is responsible for properly changing Screens in the app.
@@ -151,11 +151,15 @@ class ChangeMACScreen(Screen):
         """Take strings from input fields and use them as arguments for performing MAC address change."""
         # Store inputs in additional variables to allow us to clear Text Inputs instantly.
         interface, mac_address = self.interface_input.text.strip(), self.mac_input.text.strip()
+        # Store additional message for when default interface is used.
+        default_interface_message = ""
 
         # If there was interface provided, store it in class' instance.
-        # TODO: display popup later that a default interface was used.
         if interface:
             self.current_interface = interface
+        # If there wasn't, make sure to inform user about what kind of interface was used.
+        else:
+            default_interface_message = f"\nDefault interface ({self.current_interface}) was used."
 
         # Clear out input text fields.
         self.mac_input.text = ""
@@ -163,7 +167,7 @@ class ChangeMACScreen(Screen):
 
         # Change the Label's text of current MAC address while performing said change.
         self.current_mac.text = mac_changer.perform_mac_change(self.current_interface, mac_address)
-        show_feedback_popup("MAC Change Successful", "MAC change performed successfully.")
+        show_feedback_popup("MAC Change Successful", "MAC change performed successfully." + default_interface_message)
 
     def revert_mac(self):
         """Restores computer's MAC address to the original one."""
