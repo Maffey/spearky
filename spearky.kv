@@ -64,6 +64,18 @@ WindowManager:
             pos_hint: {"center_x": 0.5, "y": 0.1}
             on_press: root.dismiss()
 
+<BackgroundColor@Widget>
+    background_color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<BackgroundLabel@Label+BackgroundColor>
+    background_color: 0, 0, 0, 0
+
 # Main elements of UI.
 
 <MainMenuScreen>:
@@ -358,15 +370,11 @@ WindowManager:
                     text: "Status:"
                     bold: True
 
-                Label:
+                BackgroundLabel:
                     id: status_label
-                    text: "Off"
-                    canvas:
-                        Color:
-                            rgba: 1, 1, 1, 1,
-                        Rectangle:
-                            size: self.size
-                            pos: self.pos
+                    text: "off"
+                    background_color: 0, 0, 0, 0  # black
+                    color: 1, 1, 1, 1  # white
 
             BackToMenuButton:
                 on_release:
