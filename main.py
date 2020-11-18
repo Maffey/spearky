@@ -56,7 +56,7 @@ class SniffPacketsScreen(Screen):
         update_output_fields(dt) - task scheduled by Clock to update output in the text fields
     """
 
-    # It's important to note that variables below are class' attributes, not instance's of the class.
+    # It's important to note that variables below are class' attributes, not instances of the class.
     # This works fine in the case of Kivy.
     # TODO (low priority): Try to use a list of interfaces instead. Some way of getting interface names would be needed.
     # Resource: https://stackoverflow.com/questions/3837069/how-to-get-network-interface-card-names-in-python
@@ -154,7 +154,18 @@ class PenetrationToolsScreen(Screen):
 
 
 class ChangeMACScreen(Screen):
-    """Change current MAC address to the one inputted. Display default MAC address and possibly, revert the changes."""
+    """Change current MAC address to the one inputted. Display default MAC address and possibly, revert the changes.
+    
+    Attributes:
+       mac_input - TextInput for entering MAC address
+        interface_input - TextInput for entering interface
+        original_mac - Label which holds the default MAC address
+        current_mac - MAC address currently in use on the provided interface
+
+    Methods:
+        submit_mac() - perform the change of the MAC using user's input
+        revert_mac() - revert MAC address on the used interface to default one
+    """
     # Initialize Widgets of the class taken from .kv file.
     mac_input = ObjectProperty(None)
     interface_input = ObjectProperty(None)
