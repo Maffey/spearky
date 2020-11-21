@@ -210,7 +210,19 @@ class ChangeMACScreen(Screen):
 
 
 class SpoofARPScreen(Screen):
-    """Spoof ARP table and display the process' status to the user."""
+    """Spoof ARP table and display the process' status to the user.
+    
+    Attributes:
+        target_input - Text Input for IP address of target's device
+        gateway_input - Text Input for IP address of network's gateway
+        status - Label responsible for displaying information about process' status
+        spoofing_thread - separate thread, delegated to performing spoofing in the background
+        spoofer - ARPSpoofer object that does the operation of forging packets, required for spoofing
+    
+    Methods:
+        start_spoofing() - start spoofing based on given input
+        stop_spoofing() - try to stop spoofing if possible and display appropriate feedback
+    """
     target_input = ObjectProperty(None)
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
