@@ -44,9 +44,9 @@ class ARPSpoofer:
         running (bool) - whether spoofing_thread is currently running or not
 
     Methods:
-        start_spoofing() - start ARP spoofing by constantly sending forged packets between two devices to trick them
-        stop_spoofing() - stop ARP spoofing by sending forged packets
-                          that will restore network flow to the one before spoofing
+        start() - start ARP spoofing by constantly sending forged packets between two devices to trick them
+        stop() - stop ARP spoofing by sending forged packets
+                 that will restore network flow to the one before spoofing
     """
 
     def __init__(self, target_ip: str = None, gateway_ip: str = None):
