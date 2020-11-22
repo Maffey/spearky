@@ -13,6 +13,8 @@ def get_mac(ip_address: str) -> str:
     answered = scapy.srp(arp_packet, timeout=1, verbose=False)[0]
     try:
         return answered[0][1].hwsrc
+
+    # TODO (low priority): make this return an error to the GUI.
     except IndexError:
         print(f"[-] Error. Could not get a response over the network. "
               f"The IP address might be invalid or there is a problem with your connection. "
@@ -61,7 +63,7 @@ class ARPSpoofer:
         print(f"[-] Gateway address was not specified. Using default address ({gateway_ip})")
         return gateway_ip
 
-    def start_spoofing(self) -> None:
+    def start(self) -> None:
         """Start ARP spoofing by constantly sending forged packets between two devices to trick them."""
         sent_packets_count = 0
         self.running = True
@@ -76,9 +78,9 @@ class ARPSpoofer:
                 time.sleep(2)
         except KeyboardInterrupt:
             print("\n[+] Execution aborted. Restoring ARP tables...")
-            self.stop_spoofing()
+            self.stop()
 
-    def stop_spoofing(self) -> None:
+    def stop(self) -> None:
         """Stop ARP spoofing by sending forged packets that will restore network flow to the one before spoofing."""
         self.running = False
         restore(self.target_ip, self.gateway_ip)

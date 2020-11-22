@@ -2,6 +2,7 @@
 
 # Imported external modules
 import subprocess
+import threading
 
 import kivy
 
@@ -10,7 +11,6 @@ from kivy.clock import Clock
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-from threading import Thread
 
 # Modules containing the core functionality of the Spearky app.
 import core.penetration_tools.mac_changer as mac_changer
@@ -22,6 +22,7 @@ from core.penetration_tools.arp_spoofer import ARPSpoofer
 kivy.require('1.11.1')
 # Python: 3.7
 
+# TODO: Generate some kind of documentation.
 # TODO (medium priority): Implement unit tests, input validation.
 
 
@@ -203,7 +204,7 @@ class SpoofARPScreen(Screen):
     target_input = ObjectProperty(None)
     gateway_input = ObjectProperty(None)
     status = ObjectProperty(None)
-    spoofing_thread = Thread()
+    spoofing_thread = threading.Thread()
     spoofer = ARPSpoofer()
 
     def start_spoofing(self):
@@ -220,7 +221,7 @@ class SpoofARPScreen(Screen):
         # If there was target and gateway provided, perform spoofing.
         if target and gateway:
             self.spoofer = ARPSpoofer(target, gateway)
-            self.spoofing_thread = Thread(target=self.spoofer.start_spoofing)
+            self.spoofing_thread = threading.Thread(target=self.spoofer.start)
             self.spoofing_thread.start()
         # Otherwise, show an error Popup message and change status.
         else:
@@ -230,21 +231,26 @@ class SpoofARPScreen(Screen):
 
     def stop_spoofing(self):
         """Stop spoofing ARP table between chosen targets and display information it stopped."""
-        # Inform about process of stopping.
+        # Inform about ongoing process of stopping the spoofing.
         self.status.text = "stopping.."
         self.status.color = (0, 0, 0, 1)  # black
         self.status.background_color = (245 / 255, 171 / 255, 53 / 255, 1)  # orange
         # Call method to stop spoofing if its running.
         if self.spoofer.running:
-            self.spoofer.stop_spoofing()
-            # Call a thread to join with the main thread.
-            self.spoofing_thread.join()
-            # Display information indicating successful halt of spoofing.
-            self.status.text = "stopped"
-            self.status.color = (1, 1, 1, 1)  # white
-            self.status.background_color = (0, 0, 0, 1)  # black
+            # Call joining the spoofer_thread on separate thread to allow for GUI update on the main thread.
+            threading.Thread(target=self.join_spoofing_thread).start()
         else:
             show_feedback_popup("ARP Spoofing Stop", "ARP have not been started yet.")
+
+    def join_spoofing_thread(self):
+        # Call method to stop spoofing.
+        self.spoofer.stop()
+        # Call a thread to join with the main thread.
+        self.spoofing_thread.join()
+        # Display information indicating successful halt of spoofing.
+        self.status.text = "stopped"
+        self.status.color = (1, 1, 1, 1)  # white
+        self.status.background_color = (0, 0, 0, 1)  # black
 
 
 class SpearkyApp(App):
