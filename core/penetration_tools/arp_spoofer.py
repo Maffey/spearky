@@ -67,6 +67,7 @@ class ARPSpoofer:
         """Start ARP spoofing by constantly sending forged packets between two devices to trick them."""
         sent_packets_count = 0
         self.running = True
+        # TODO: Does it need try now?
         try:
             while self.running:
                 spoof(self.target_ip, self.gateway_ip)

@@ -242,7 +242,7 @@ class SpoofARPScreen(Screen):
         self.target_input.text = ""
         self.gateway_input.text = ""
         # If there was target and gateway provided, perform spoofing.
-        # TODO: If no gateway, use default one (ending with .1).
+        # TODO: If there's no gateway, use default one (ending with .1).
         if target and gateway:
             self.spoofer = ARPSpoofer(target, gateway)
             self.spoofing_thread = threading.Thread(target=self.spoofer.start)
