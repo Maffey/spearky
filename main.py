@@ -264,7 +264,7 @@ class SpoofARPScreen(Screen):
             # Call joining the spoofer_thread on separate thread to allow for GUI update on the main thread.
             threading.Thread(target=self.join_spoofing_thread).start()
         else:
-            show_feedback_popup("ARP Spoofing Stop", "ARP have not been started yet.")
+            show_feedback_popup("ARP Spoofing Stop", "ARP spoofing has not been started yet.")
 
     def join_spoofing_thread(self):
         # Call method to stop spoofing.
