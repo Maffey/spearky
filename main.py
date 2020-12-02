@@ -296,5 +296,5 @@ def show_feedback_popup(title, content_text, size=(350, 200)):
 
 # Execute to start the app with preconfigured packets forwarding.
 if __name__ == '__main__':
-    subprocess.call(["echo", "1", ">", "/proc/sys/net/ipv4/ip_forward"])
+    subprocess.call(["sysctl", "-w", "net.ipv4.ip_forward=1"])
     SpearkyApp().run()
