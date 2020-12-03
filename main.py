@@ -42,6 +42,11 @@ class DetectionToolsScreen(Screen):
     pass
 
 
+class ScanNetworkScreen(Screen):
+    """Scan local network for IP addresses and their associated MAC addresses."""
+    pass
+
+
 class SniffPacketsScreen(Screen):
     """Sniff packets asynchronously and find any potential login credentials.
 

@@ -16,6 +16,7 @@ WindowManager:
     MainMenuScreen:
 
     DetectionToolsScreen:
+    ScanNetworkScreen:
     SniffPacketsScreen:
 
     EscalationToolsScreen:
@@ -119,6 +120,12 @@ WindowManager:
         padding: standard_menu_padding
 
         MenuButton:
+            text: "Scan Network"
+            on_release:
+                app.root.current = "scan_network_screen"
+                root.manager.transition.direction = "left"
+
+        MenuButton:
             text: "Sniff Packets"
             on_release:
                 app.root.current = "sniff_packets_screen"
@@ -129,6 +136,44 @@ WindowManager:
             on_release:
                 app.root.current = "main_menu_screen"
                 root.manager.transition.direction = "right"
+
+
+<ScanNetworkScreen>:
+    name: "scan_network_screen"
+
+    # TODO: Make this into class.
+    BoxLayout:
+        orientation: "vertical"
+        padding: standard_padding
+        spacing: standard_spacing
+
+        GridLayout:
+            cols: 2
+            spacing: standard_spacing
+
+            Label:
+                text: "IP address"
+                size_hint_y: None
+                height: standard_text_height
+
+            Label:
+                text: "MAC address"
+                size_hint_y: None
+                height: standard_text_height
+
+        FloatLayout:
+            size_hint_y: 0.5
+
+            StartActionButton:
+                text: "Scan"
+                on_release: # root.scan_network()
+
+
+            BackToMenuButton:
+                on_release:
+                    app.root.current = "detection_tools_screen"
+                    root.manager.transition.direction = "right"
+
 
 
 <SniffPacketsScreen>:
@@ -177,12 +222,14 @@ WindowManager:
             TextInput:
                 id: terminal_output_text_input
                 font_size: 10
+                readonly: True
 
 
             TextInput:
                 id: found_credentials_text_input
                 size_hint_x: 0.6
                 font_size: 10
+                readonly: True
 
         FloatLayout:
             size_hint_y: 0.5
