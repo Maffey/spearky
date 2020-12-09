@@ -3,9 +3,7 @@
 # Imported external modules
 import subprocess
 import threading
-
 import kivy
-
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
@@ -22,6 +20,8 @@ from core.penetration_tools.arp_spoofer import ARPSpoofer
 
 # Ensure a proper version of kivy is installed.
 kivy.require('1.11.1')
+
+
 # Python: 3.7
 
 # TODO (medium priority): Implement unit tests, input validation.
