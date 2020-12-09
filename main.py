@@ -47,11 +47,11 @@ class ScanNetworkScreen(Screen):
     """Scan chosen local network for IP addresses and their associated MAC addresses.
 
     Attributes:
-        ip_network - IP address together with a mask
-        network_grid - GridLayout object that holds the data with IP and associated MACs.
+        ip_network - Text Input for IP address together with a mask
+        network_grid - GridLayout object that holds the data with IP and associated MACs
 
     Methods:
-        scan_network() - scan chosen ip range to find and display IP and MAC addresses.
+        scan_network() - scan chosen ip range to find and display IP and MAC addresses
     """
     ip_network_input = ObjectProperty(None)
     network_grid = ObjectProperty(None)
@@ -81,6 +81,7 @@ class SniffPacketsScreen(Screen):
         terminal_output - Text Input for displaying output from terminal
         found_credentials - Text Input for displaying credentials found in terminal's output
         sniffer - PacketSniffer object responsible for starting and stopping sniffing
+        update_fields_event - event attribute that controls regular interface updates.
 
     Methods:
         start_sniffing() - run after pressing "Sniff" Button
@@ -183,7 +184,7 @@ class BackdoorListenerScreen(Screen):
             self.terminal.text, self.command_line.text, self.ip_address_input.text, self.port_input.text = "", "", "", ""
             # Call thread to initialize and run BackdoorListener.
             self.backdoor_running = True
-            self.backdoor_thread = threading.Thread(target=self.run_listener, args=(ip_address, port))
+            self.backdoor_thread = threading.Thread(target=self.initialize_listener, args=(ip_address, port))
             self.backdoor_thread.start()
             self.terminal.text += "[+] Waiting for incoming connection...\n"
         else:
@@ -193,6 +194,8 @@ class BackdoorListenerScreen(Screen):
     # TODO: If listener is stopped before connecting, it freezes.
     def stop_listener(self):
         if self.backdoor_running:
+            # TODO: untested line, check later.
+            self.backdoor_listener.run_command("exit")
             self.backdoor_thread.join()
             # Cancel scheduled event of updating terminal.
             self.update_field_event.cancel()
@@ -205,7 +208,7 @@ class BackdoorListenerScreen(Screen):
             show_feedback_popup("Backdoor Listener Error",
                                 "The Backdoor Listener cannot be stopped. It hasn't yet started.")
 
-    def run_listener(self, ip_address, port):
+    def initialize_listener(self, ip_address, port):
         # Create BackdoorListener instance.
         if port:
             self.backdoor_listener = BackdoorListener(ip_address, int(port))
