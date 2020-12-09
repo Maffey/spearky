@@ -9,11 +9,13 @@ import kivy
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
+from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 # Modules containing the core functionality of the Spearky app.
 import core.penetration_tools.mac_changer as mac_changer
+import core.detection_tools.network_scanner as network_scanner
 from core.detection_tools.packet_sniffer import PacketSniffer
 from core.escalation_tools.backdoor_listener import BackdoorListener
 from core.penetration_tools.arp_spoofer import ARPSpoofer
@@ -22,7 +24,6 @@ from core.penetration_tools.arp_spoofer import ARPSpoofer
 kivy.require('1.11.1')
 # Python: 3.7
 
-# TODO: Generate some kind of documentation.
 # TODO (medium priority): Implement unit tests, input validation.
 
 
@@ -43,8 +44,33 @@ class DetectionToolsScreen(Screen):
 
 
 class ScanNetworkScreen(Screen):
-    """Scan local network for IP addresses and their associated MAC addresses."""
-    pass
+    """Scan chosen local network for IP addresses and their associated MAC addresses.
+
+    Attributes:
+        ip_network - IP address together with a mask
+        network_grid - GridLayout object that holds the data with IP and associated MACs.
+
+    Methods:
+        scan_network() - scan chosen ip range to find and display IP and MAC addresses.
+    """
+    ip_network = ObjectProperty(None)
+    network_grid = ObjectProperty(None)
+
+    def scan_network(self):
+        """Scan network or single IP address using provided IP address and mask."""
+        # Clear results table in preparation to printing a new one.
+        self.network_grid.clear_widgets()
+        # Save ip_network value into separate value.
+        ip_network_text = self.ip_network.text
+        # Clear input field.
+        self.ip_network.text = ""
+        # Perform network scan and save the results into list of dictionaries.
+        found_devices = network_scanner.scan(ip_network_text)
+        # Display the results in a grid.
+        # TODO: Make text of addresses selectable or copy it into clipboard on click.
+        for device in found_devices:
+            self.network_grid.add_widget(Label(text=device["ip"], font_size=18))
+            self.network_grid.add_widget(Label(text=device["mac"], font_size=18))
 
 
 class SniffPacketsScreen(Screen):
@@ -81,7 +107,7 @@ class SniffPacketsScreen(Screen):
         # Clear text in interface field.
         self.interface_input.text = ""
 
-        # If user provided no variable, use default one (eth0)
+        # If user provided no variable, use default one (eth0).
         if not interface:
             self.sniffer = PacketSniffer()
         else:

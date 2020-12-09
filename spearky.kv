@@ -140,6 +140,8 @@ WindowManager:
 
 <ScanNetworkScreen>:
     name: "scan_network_screen"
+    ip_network: ip_network_text_input
+    network_grid: network_grid_layout
 
     # TODO: Make this into class.
     BoxLayout:
@@ -150,23 +152,45 @@ WindowManager:
         GridLayout:
             cols: 2
             spacing: standard_spacing
+            size_hint_y: None
 
             Label:
-                text: "IP address"
+                text: "IP address/mask:"
                 size_hint_y: None
                 height: standard_text_height
+                bold: True
+
+            TextInput:
+                id: ip_network_text_input
+                size_hint_y: None
+                height: standard_text_height
+                multiline: False
 
             Label:
-                text: "MAC address"
+                text: "IP address".upper()
                 size_hint_y: None
-                height: standard_text_height
+                bold: True
+                font_size: 20
+                height: standard_text_height * 2
+
+            Label:
+                text: "MAC address".upper()
+                size_hint_y: None
+                bold: True
+                font_size: 20
+                height: standard_text_height * 2
+
+        GridLayout:
+            id: network_grid_layout
+            cols: 2
+            spacing: standard_spacing
 
         FloatLayout:
             size_hint_y: 0.5
 
             StartActionButton:
                 text: "Scan"
-                on_release: # root.scan_network()
+                on_release: root.scan_network()
 
 
             BackToMenuButton:
