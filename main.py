@@ -163,7 +163,6 @@ class EscalationToolsScreen(Screen):
     pass
 
 
-# TODO: Add documentation here.
 class BackdoorListenerScreen(Screen):
     """Listen for incoming connections from installed backdoors."""
     ip_address_input = ObjectProperty(None)
@@ -177,6 +176,7 @@ class BackdoorListenerScreen(Screen):
     backdoor_running = False
 
     def start_listener(self):
+        """Begin listening for incoming backdoor connections if possible."""
         if not self.backdoor_running:
             # Store ip_address and port into separate variables.
             ip_address, port = self.ip_address_input.text, self.port_input.text
@@ -191,11 +191,10 @@ class BackdoorListenerScreen(Screen):
             show_feedback_popup("Backdoor Listener Error",
                                 "The Backdoor Listener has already been started. Stop the process first.")
 
-    # TODO: If listener is stopped before connecting, it freezes.
+    # Note: If listener is stopped before connecting, it freezes.
     def stop_listener(self):
+        """Stop listening for backdoor connections. Close current connection if exists."""
         if self.backdoor_running:
-            # TODO: untested line, check later.
-            self.backdoor_listener.run_command("exit")
             self.backdoor_thread.join()
             # Cancel scheduled event of updating terminal.
             self.update_field_event.cancel()
@@ -209,6 +208,7 @@ class BackdoorListenerScreen(Screen):
                                 "The Backdoor Listener cannot be stopped. It hasn't yet started.")
 
     def initialize_listener(self, ip_address, port):
+        """Create BackdoorListener instance with given attributes. Schedule listener on the Clock."""
         # Create BackdoorListener instance.
         if port:
             self.backdoor_listener = BackdoorListener(ip_address, int(port))
@@ -228,7 +228,6 @@ class BackdoorListenerScreen(Screen):
             self.terminal.text += "\n".join(self.backdoor_listener.terminal) + "\n"
             self.backdoor_listener.terminal = []
 
-    # TODO: Implement so pressing enter in the text field automatically runs this.
     def send_command(self):
         """Send the command the user has entered to target's device."""
         self.backdoor_listener.run_command(self.command_line.text)

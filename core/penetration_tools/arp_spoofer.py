@@ -50,6 +50,7 @@ class ARPSpoofer:
     """
 
     def __init__(self, target_ip: str = None, gateway_ip: str = None):
+        """Initialize both IPs and set running status to False (ARPSpoofer not yet started)."""
         self.target_ip = target_ip
         self.gateway_ip = gateway_ip
         self.running = False
