@@ -1,2 +1,4 @@
 scapy~=2.4.4
 Kivy~=1.11.1
+requests~=2.24.0
+beautifulsoup4~=4.9.3
