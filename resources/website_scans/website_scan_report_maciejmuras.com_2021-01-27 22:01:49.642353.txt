@@ -1,5 +1,0 @@
-http://maciejmuras.com
-http://maciejmuras.com/
-[+] Testing form in http://maciejmuras.com
-[+] Testing form in http://maciejmuras.com/
-[-] The website scan has been completed successfully.
