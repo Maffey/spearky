@@ -15,7 +15,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import core.penetration_tools.mac_changer as mac_changer
 import core.detection_tools.network_scanner as network_scanner
 from core.detection_tools.packet_sniffer import PacketSniffer
-from core.detection_tools.vulnerability_scanner import Scanner
+from core.detection_tools.vulnerability_scanner import WebsiteScanner
 from core.escalation_tools.backdoor_listener import BackdoorListener
 from core.penetration_tools.arp_spoofer import ARPSpoofer
 
@@ -78,24 +78,36 @@ class ScanWebsiteScreen(Screen):
     """Scan website for vulnerabilities."""
     target_url_input = ObjectProperty(None)
     website_report = ObjectProperty(None)
-    scanner_thread = threading.Thread()
-    scanner = object
+    website_scanner_thread = threading.Thread()
+    website_scanner = WebsiteScanner()
     update_field_event = None
 
-    def start_scan(self):
-        target_url = self.target_url_input.text
-        self.target_url_input.text, self.website_report.text = "", ""
-        self.scanner = Scanner(target_url)
-        self.update_field_event = Clock.schedule_interval(self.update_report_field, 1)
-        self.scanner_thread = threading.Thread(target=self.scanner.start)
-        self.scanner_thread.start()
+    def start_website_scanner(self):
+        # TODO: Add some error catching
+        if not self.website_scanner.running:
+            target_url = self.target_url_input.text.lower()
+            if not target_url.startswith("http://"):
+                target_url = "http://" + target_url
+            self.target_url_input.text, self.website_report.text = "", ""
+            self.website_scanner = WebsiteScanner(target_url)
+            self.update_field_event = Clock.schedule_interval(self.update_report_field, 1)
+            self.website_scanner_thread = threading.Thread(target=self.website_scanner.start)
+            self.website_scanner_thread.start()
+        else:
+            show_feedback_popup("Website Scanner Error",
+                                "The Website Scanner has already been started. Stop the process first.")
 
-    def stop_scan(self):
-        self.website_report.text += "[-] The website scan has been stopped."
-        self.scanner.running = False
-        self.scanner_thread.join()
-        self.scanner.session.close()
-        self.update_field_event.cancel()
+    def stop_website_scanner(self):
+        if self.website_scanner.running:
+            self.website_scanner.save_report_to_file(self.website_report)
+            self.website_report.text += "[-] The website scan has been stopped. Report has been generated."
+            self.website_scanner.running = False
+            self.website_scanner_thread.join()
+            self.website_scanner.session.close()
+            self.update_field_event.cancel()
+        else:
+            show_feedback_popup("Website Scanner Error",
+                                "The Website Scanner cannot be stopped. It hasn't yet started.")
 
     def update_report_field(self, dt):
         """Update report field with found information and clear Scanner's attributes.
@@ -104,9 +116,9 @@ class ScanWebsiteScreen(Screen):
             dt - delta time, required and used by Clock
         """
         # If there's content stored in report_text_input, display it in the text field.
-        if self.scanner.scan_report:
-            self.website_report.text += "\n".join(self.scanner.scan_report) + "\n"
-            self.scanner.scan_report = []
+        if self.website_scanner.scan_report:
+            self.website_report.text += "\n".join(self.website_scanner.scan_report) + "\n"
+            self.website_scanner.scan_report = []
 
 
 class SniffPacketsScreen(Screen):
