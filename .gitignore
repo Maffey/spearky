@@ -2,6 +2,6 @@
 /.idea/
 /venv/
 # Do not store reports
-/website_scans/*
+website_scans/*
 # But store the directory itself
 !website_scans/.gitkeep
