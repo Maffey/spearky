@@ -208,7 +208,8 @@ WindowManager:
 
 <ScanWebsiteScreen>:
     name: "scan_website_screen"
-    target_url: target_url_text_input
+    target_url_input: target_url_text_input
+    website_report: website_report_text_input
 
     BoxLayout:
         orientation: "vertical"
@@ -242,11 +243,11 @@ WindowManager:
 
             StartActionButton:
                 text: "Scan"
-                on_release:
+                on_release: root.start_scan()
 
             StopActionButton:
                 text: "Stop"
-                on_release:
+                on_release: root.stop_scan()
 
             BackToMenuButton:
                 on_release:

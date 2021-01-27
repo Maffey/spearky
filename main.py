@@ -15,6 +15,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import core.penetration_tools.mac_changer as mac_changer
 import core.detection_tools.network_scanner as network_scanner
 from core.detection_tools.packet_sniffer import PacketSniffer
+from core.detection_tools.vulnerability_scanner import Scanner
 from core.escalation_tools.backdoor_listener import BackdoorListener
 from core.penetration_tools.arp_spoofer import ARPSpoofer
 
@@ -75,7 +76,37 @@ class ScanNetworkScreen(Screen):
 
 class ScanWebsiteScreen(Screen):
     """Scan website for vulnerabilities."""
-    pass
+    target_url_input = ObjectProperty(None)
+    website_report = ObjectProperty(None)
+    scanner_thread = threading.Thread()
+    scanner = object
+    update_field_event = None
+
+    def start_scan(self):
+        target_url = self.target_url_input.text
+        self.target_url_input.text, self.website_report.text = "", ""
+        self.scanner = Scanner(target_url)
+        self.update_field_event = Clock.schedule_interval(self.update_report_field, 1)
+        self.scanner_thread = threading.Thread(target=self.scanner.start)
+        self.scanner_thread.start()
+
+    def stop_scan(self):
+        self.website_report.text += "[-] The website scan has been stopped."
+        self.scanner.running = False
+        self.scanner_thread.join()
+        self.scanner.session.close()
+        self.update_field_event.cancel()
+
+    def update_report_field(self, dt):
+        """Update report field with found information and clear Scanner's attributes.
+
+        Attributes:
+            dt - delta time, required and used by Clock
+        """
+        # If there's content stored in report_text_input, display it in the text field.
+        if self.scanner.scan_report:
+            self.website_report.text += "\n".join(self.scanner.scan_report) + "\n"
+            self.scanner.scan_report = []
 
 
 class SniffPacketsScreen(Screen):
