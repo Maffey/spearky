@@ -99,6 +99,7 @@ class ScanWebsiteScreen(Screen):
 
     def stop_website_scanner(self):
         if self.website_scanner.running:
+            # TODO: Make saving report optional with some checkbox.
             self.website_scanner.save_report_to_file(self.website_report)
             self.website_report.text += "[-] The website scan has been stopped. Report has been generated."
             self.website_scanner.running = False
