@@ -17,6 +17,7 @@ WindowManager:
 
     DetectionToolsScreen:
     ScanNetworkScreen:
+    ScanWebsiteScreen:
     SniffPacketsScreen:
 
     EscalationToolsScreen:
@@ -116,13 +117,19 @@ WindowManager:
 
     BoxLayout:
         orientation: "vertical"
-        spacing: root.height / 4
+        spacing: root.height / 6
         padding: standard_menu_padding
 
         MenuButton:
             text: "Scan Network"
             on_release:
                 app.root.current = "scan_network_screen"
+                root.manager.transition.direction = "left"
+
+        MenuButton:
+            text: "Scan Websites for Vulnerabilities"
+            on_release:
+                app.root.current = "scan_website_screen"
                 root.manager.transition.direction = "left"
 
         MenuButton:
@@ -192,6 +199,54 @@ WindowManager:
                 text: "Scan"
                 on_release: root.scan_network()
 
+
+            BackToMenuButton:
+                on_release:
+                    app.root.current = "detection_tools_screen"
+                    root.manager.transition.direction = "right"
+
+
+<ScanWebsiteScreen>:
+    name: "scan_website_screen"
+    target_url: target_url_text_input
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: standard_padding
+        spacing: standard_spacing
+
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+
+            Label:
+                text: "Target URL:"
+                size_hint_y: None
+                height: standard_text_height
+                bold: True
+
+            TextInput:
+                id: target_url_text_input
+                hint_text: "http://example.com"
+                size_hint_y: None
+                height: standard_text_height
+                multiline: False
+
+        TextInput:
+            id: website_report_text_input
+            font_size: 10
+            readonly: True
+
+        FloatLayout:
+            size_hint_y: 0.5
+
+            StartActionButton:
+                text: "Scan"
+                on_release:
+
+            StopActionButton:
+                text: "Stop"
+                on_release:
 
             BackToMenuButton:
                 on_release:

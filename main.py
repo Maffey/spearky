@@ -73,6 +73,11 @@ class ScanNetworkScreen(Screen):
             self.network_grid.add_widget(Label(text=device["mac"], font_size=18))
 
 
+class ScanWebsiteScreen(Screen):
+    """Scan website for vulnerabilities."""
+    pass
+
+
 class SniffPacketsScreen(Screen):
     """Sniff packets asynchronously and find any potential login credentials.
 
