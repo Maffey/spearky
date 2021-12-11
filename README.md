@@ -1,6 +1,9 @@
 # Spearky
 Spearky - penetration testing app with GUI developed in Kivy.
 
+## Requirements
+Kali Linux is required to properly run this app.
+
 ## Installation
 
 ### English
